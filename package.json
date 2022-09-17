@@ -1,0 +1,24 @@
+{
+    "name": "zabbix-module-sqlexplorer",
+    "version": "1.0.0",
+    "description": "",
+    "main": "app.js",
+    "scripts": {
+        "clean": "rm -rf ./public/ .cache",
+        "docker-init": "docker build -t noderollup:latest ./",
+        "prepare": "npm install",
+        "build": "rollup app.js -f iife -o ./public/app.min.js -p @rollup/plugin-node-resolve"
+    },
+    "author": "gr8b",
+    "license": "MIT",
+    "devDependencies": {
+        "@rollup/plugin-node-resolve": "^13.0.0",
+        "rollup": "^2.50.6"
+    },
+    "dependencies": {
+        "@codemirror/basic-setup": "^0.17.1",
+        "@codemirror/highlight": "^0.17.2",
+        "@codemirror/lang-sql": "^0.17.1",
+        "@codemirror/view": "^0.17.7"
+    }
+}

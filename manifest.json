@@ -1,0 +1,20 @@
+{
+	"manifest_version": 1,
+	"id": "sqlexplorer",
+	"name": "SQL Explorer",
+	"author": "",
+	"description": "Welcome to dark side of UI, be attentive with your wishes.",
+	"version": "1.0",
+	"namespace": "SqlExplorer",
+	"url": "",
+	"actions": {
+		"sqlexplorer.form": {
+			"class": "SqlForm",
+			"view": "sql.form.view"
+		},
+		"sqlexplorer.csv": {
+			"class": "SqlForm",
+			"layout": "layout.csv"
+		}
+	}
+}

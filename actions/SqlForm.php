@@ -1,0 +1,128 @@
+<?php
+
+namespace Modules\SqlExplorer\Actions;
+
+use CUrl;
+use CWebUser;
+use CController as Action;
+use CMessageHelper;
+use CControllerResponseData;
+use CControllerResponseRedirect;
+
+class SqlForm extends Action {
+
+	/** @property \Modules\SqlExplorer\Module $module */
+	public $module;
+
+	public function init() {
+		if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+			$this->disableSIDvalidation();
+		}
+	}
+
+	protected function checkInput() {
+		$fields = $this->getValidationRules();
+
+		return $this->validateInput($fields);
+	}
+
+	protected function getValidationRules() {
+		if ($this->getAction() === 'sqlexplorer.csv') {
+			return [
+				'fav' => 'int32',
+				'query' => 'string|required|not_empty',
+				'add_column_names' => 'in 1'
+			];
+		}
+
+		return [
+			'fav' => 'int32',
+			'query' => 'string',
+			'add_column_names' => 'in 1',
+			'preview' => 'in 1'
+		];
+	}
+
+	protected function checkPermissions() {
+		return CWebUser::getType() == USER_TYPE_SUPER_ADMIN;
+	}
+
+	protected function doAction() {
+		$data = [
+			'fav' => 0,
+			'preview' => 0,
+			'query'	 => '',
+			'add_column_names' => 0
+		];
+		$this->getInputs($data, array_keys($data));
+
+		$this->setResponse(
+			$this->getAction() === 'sqlexplorer.csv'
+				? $this->getCsvResponse($data)
+				: $this->getHtmlResponse($data)
+		);
+	}
+
+	protected function getCsvResponse(array $data) {
+		$cursor = DBselect($data['query']);
+
+		if ($cursor === false) {
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'sqlexplorer.form')
+					->getUrl()
+			);
+			$response->setFormData($this->getInputAll());
+
+			if (version_compare(ZABBIX_VERSION, '6.0', '<')) {
+				[$message] = clear_messages();
+				$response->setMessageError($message['message']);
+			}
+			else {
+				CMessageHelper::setErrorTitle(_('Query error'));
+			}
+
+			return $response;
+		}
+
+		$rows = DBfetchArray($cursor);
+
+		if ($rows && $data['add_column_names']) {
+			array_unshift($rows, array_keys($rows[0]));
+		}
+
+		$data = [
+			'main_block' => zbx_toCSV($rows)
+		];
+		$response = new CControllerResponseData($data);
+		$response->setFileName('query_export.csv');
+
+		return $response;
+	}
+
+	protected function getHtmlResponse(array $data) {
+		if ($data['preview']) {
+			$cursor = DBselect($data['query']);
+			$data['rows'] = $cursor === false ? [] : DBfetchArray($cursor);
+
+			if ($data['rows'] && $data['add_column_names']) {
+				array_unshift($data['rows'], array_keys($data['rows'][0]));
+			}
+
+			if (version_compare(ZABBIX_VERSION, '6.0', '<')) {
+				show_messages();
+			}
+		}
+
+		$data['database'] = $this->module->getDatabase();
+		$data['favorites'] = [
+			['title' => '', 'query' => ''],
+			['title' => 'all users', 'query' => 'select userid,alias from users'],
+			['title' => 'items', 'query' => 'select itemid,name,description from items']
+		];
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('SQL Explorer'));
+
+		return $response;
+	}
+}
