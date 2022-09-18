@@ -8,7 +8,7 @@ use CWebUser;
 use Core\CModule as CModule;
 use CController as CAction;
 use CMenuItem;
-use Modules\SqlExplorer\Actions\SqlForm;
+use Modules\SqlExplorer\Actions\BaseAction;
 use Modules\SqlExplorer\Compatibility\Html\CFormGrid as CFormGridCompat;
 use Modules\SqlExplorer\Compatibility\Html\CFormField as CFormFieldCompat;
 
@@ -25,7 +25,7 @@ class Module extends CModule {
 	 * @param CAction $action    Current request handler object.
 	 */
 	public function onBeforeAction(CAction $action): void {
-		if (is_a($action, SqlForm::class)) {
+		if (is_a($action, BaseAction::class)) {
 			$action->module = $this;
 		}
 	}
@@ -49,6 +49,10 @@ class Module extends CModule {
 			'table' => $DB['DATABASE'],
 			'schema' => $DB['SCHEMA']
 		];
+	}
+
+	public function getAssetsUrl() {
+		return 'modules/'.basename($this->getDir()).'/public/';
 	}
 
 	protected function registerMenuEntry() {

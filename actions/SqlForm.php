@@ -2,23 +2,14 @@
 
 namespace Modules\SqlExplorer\Actions;
 
+use DB;
 use CUrl;
-use CWebUser;
-use CController as Action;
 use CMessageHelper;
 use CControllerResponseData;
 use CControllerResponseRedirect;
+use CProfile;
 
-class SqlForm extends Action {
-
-	/** @property \Modules\SqlExplorer\Module $module */
-	public $module;
-
-	public function init() {
-		if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-			$this->disableSIDvalidation();
-		}
-	}
+class SqlForm extends BaseAction {
 
 	protected function checkInput() {
 		$fields = $this->getValidationRules();
@@ -43,15 +34,11 @@ class SqlForm extends Action {
 		];
 	}
 
-	protected function checkPermissions() {
-		return CWebUser::getType() == USER_TYPE_SUPER_ADMIN;
-	}
-
 	protected function doAction() {
 		$data = [
 			'fav' => 0,
 			'preview' => 0,
-			'query'	 => '',
+			'query'	 => "\n\n\n",
 			'add_column_names' => 0
 		];
 		$this->getInputs($data, array_keys($data));
@@ -114,11 +101,29 @@ class SqlForm extends Action {
 			}
 		}
 
+		$data['public_path'] = $this->module->getAssetsUrl();
 		$data['database'] = $this->module->getDatabase();
-		$data['favorites'] = [
-			['title' => '', 'query' => ''],
-			['title' => 'all users', 'query' => 'select userid,alias from users'],
-			['title' => 'items', 'query' => 'select itemid,name,description from items']
+		$data['queries'] = array_merge(['title' => '', 'query' => "\n\n\n"],
+			CProfile::get('module-sqlexplorer-queries', [])
+		);
+		$data['db_schema'] = [];
+		foreach (DB::getSchema() as $table => $schema) {
+			$data['db_schema'][$table] = [];
+
+			foreach ($schema['fields'] as $field => $field_schema) {
+				// https://codemirror.net/docs/ref/#autocomplete.Completion
+				$info = $schema['key'] === $field ? _('Primary key') : '';
+				$data['db_schema'][$table][] = [
+					'label' => $field,
+					'info' => $info
+				];
+			}
+		};
+
+		$data['queries'] = [
+			['title' => '', 'query' => "\n\n\n"],
+			['title' => 'items', 'query' => 'select * from items'],
+			['title' => 'users', 'query' => 'select * from users']
 		];
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('SQL Explorer'));

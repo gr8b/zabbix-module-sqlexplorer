@@ -1,6 +1,9 @@
 <?php
 
 use Modules\SqlExplorer\Compatibility\Html\CFormField;
+use Modules\SqlExplorer\Helpers\Html\StyleTag;
+use Modules\SqlExplorer\Helpers\Html\JsonDataTag;
+use Modules\SqlExplorer\Helpers\Html\ScriptTag;
 
 $url = (new Curl())
 	->setArgument('action', 'sqlexplorer.form')
@@ -26,11 +29,25 @@ $grid->addItem([
 		(new CSelect('fav'))
 			->setId('fav')
 			->setValue($data['fav'])
-			->addOptions(CSelect::createOptionsFromArray(array_column($data['favorites'], 'title')))
+			->addOptions(CSelect::createOptionsFromArray(array_column($data['queries'], 'title')))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH),
-		new CButton('save_query', _('Save')),
-		(new CButton('delete_query', _('Remove')))->setEnabled($data['fav'] > 0)
-	]))->setId('fav-row'))
+		(new CButton('update_query', _('Update')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->setEnabled($data['fav'] > 0),
+		(new CButton('delete_query', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->setEnabled($data['fav'] > 0)
+	]))->addClass('margin-between'))
+]);
+
+$grid->addItem([
+	new CLabel(_('Save as')),
+	new CFormField((new CDiv([
+		(new CTextBox('name'))
+			->setAttribute('autocomplete', 'off')
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH),
+		(new CButton('save_query', _('Save')))->addClass(ZBX_STYLE_BTN_ALT)
+	]))->addClass('margin-between'))
 ]);
 
 $grid->addItem([
@@ -66,49 +83,26 @@ $form->addItem((new CTabView())
 	->addTab('default', null, $grid)
 	->setFooter(makeFormFooter(
 		(new CSubmit('preview', _('Preview')))->setAttribute('value', 1),
-		[
-			new CButton('csv', _('CSV')),
-		]
+		[new CButton('csv', _('CSV'))]
 	))
 );
-$queries_json = json_encode($data['favorites']);
 
 $widget
-	->addItem(new CTag('style', true, <<<'CSS'
-		#fav-row z-select,#fav-row button { vertical-align: middle; margin-right: 5px; }
+	->addItem(new StyleTag(<<<'CSS'
+		.margin-between > * { vertical-align: middle; margin-right: 5px !important; }
+
+		/* Codemirror styles */
 		.cm-wrap.cm-focused { outline: 0 none; }
 		.cm-wrap { border: 1px solid silver; }
+		.cm-scroller { font-family: Consolas, Menlo, Monaco, source-code-pro, Courier New, monospace !important; font-size: 12px; }
 	CSS
 	))
+	->addItem(new JsonDataTag('page-json', [
+		'dark_theme' => in_array(getUserTheme(CWebUser::$data), ['dark-theme']),
+		'queries' => $data['queries'],
+		'db_schema' => $data['db_schema']
+	]))
 	->addItem($form)
 	->addItem($table)
-	->addItem(new CScriptTag('let queries = '.json_encode($data['favorites']).';'.<<<'JAVASCRIPT'
-		document.getElementById('csv').addEventListener('click', function() {
-			let form = this.closest('form');
-	
-			form.setAttribute('action', 'zabbix.php?action=sqlexplorer.csv');
-			form.submit();
-		});
-		document.getElementById('preview').addEventListener('click', function() {
-			let form = this.closest('form');
-	
-			form.setAttribute('action', 'zabbix.php?action=sqlexplorer.form');
-			form.submit();
-		});
-		document.getElementById('fav').addEventListener('change', function() {
-			document.querySelector('textarea[name="query"]').value = queries[this.value].query;
-			document.querySelector('textarea[name="query"]').dispatchEvent(new Event('change'));
-
-			if (this.value > 0) {
-				document.getElementById('delete_query').removeAttribute('disabled');
-			}
-			else {
-				document.getElementById('delete_query').setAttribute('disabled', 'disabled');
-			}
-		});
-	JAVASCRIPT
-	))
-	->addItem((new CTag('script', true))
-		->setAttribute('src', 'modules/zabbix-module-sqlexplorer/public/app.min.js')
-		->setAttribute('type', 'text/javascript'))
+	->addItem((new ScriptTag())->setAttribute('src', $data['public_path'].'app.min.js'))
 	->show();

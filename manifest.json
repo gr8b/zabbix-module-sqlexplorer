@@ -2,15 +2,19 @@
 	"manifest_version": 1,
 	"id": "sqlexplorer",
 	"name": "SQL Explorer",
-	"author": "",
-	"description": "Welcome to dark side of UI, be attentive with your wishes.",
+	"author": "gr8b",
+	"description": "Make SQL queries and export results to .csv files",
 	"version": "1.0",
 	"namespace": "SqlExplorer",
-	"url": "",
+	"url": "https://github.com/gr8b/zabbix-module-sqlexplorer",
 	"actions": {
 		"sqlexplorer.form": {
 			"class": "SqlForm",
 			"view": "sql.form.view"
+		},
+		"sqlexplorer.queries": {
+			"class": "StoredSql",
+			"layout": "layout.json"
 		},
 		"sqlexplorer.csv": {
 			"class": "SqlForm",
