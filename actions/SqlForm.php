@@ -28,6 +28,7 @@ class SqlForm extends BaseAction {
 
 		return [
 			'fav' => 'int32',
+			'name' => 'string',
 			'query' => 'string',
 			'add_column_names' => 'in 1',
 			'preview' => 'in 1'
@@ -37,7 +38,7 @@ class SqlForm extends BaseAction {
 	protected function doAction() {
 		$data = [
 			'fav' => 0,
-			'preview' => 0,
+			'name' => '',
 			'query'	 => "\n\n\n",
 			'add_column_names' => 0
 		];
@@ -88,7 +89,7 @@ class SqlForm extends BaseAction {
 	}
 
 	protected function getHtmlResponse(array $data) {
-		if ($data['preview']) {
+		if ($this->hasInput('preview')) {
 			$cursor = DBselect($data['query']);
 			$data['rows'] = $cursor === false ? [] : DBfetchArray($cursor);
 
@@ -103,9 +104,10 @@ class SqlForm extends BaseAction {
 
 		$data['public_path'] = $this->module->getAssetsUrl();
 		$data['database'] = $this->module->getDatabase();
-		$data['queries'] = array_merge(['title' => '', 'query' => "\n\n\n"],
-			CProfile::get('module-sqlexplorer-queries', [])
-		);
+		$queries = array_map('json_decode', CProfile::getArray(StoredSql::QUERIES_PROFILE_KEY, []));
+		$queries = array_map('get_object_vars', $queries);
+		$data['queries'] = array_merge([['title' => '', 'query' => "\n\n\n"]], array_values($queries));
+
 		$data['db_schema'] = [];
 		foreach (DB::getSchema() as $table => $schema) {
 			$data['db_schema'][$table] = [];
@@ -120,11 +122,6 @@ class SqlForm extends BaseAction {
 			}
 		};
 
-		$data['queries'] = [
-			['title' => '', 'query' => "\n\n\n"],
-			['title' => 'items', 'query' => 'select * from items'],
-			['title' => 'users', 'query' => 'select * from users']
-		];
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('SQL Explorer'));
 

@@ -41,12 +41,14 @@ $grid->addItem([
 ]);
 
 $grid->addItem([
-	new CLabel(_('Save as')),
+	new CLabel(_('Save query as')),
 	new CFormField((new CDiv([
-		(new CTextBox('name'))
+		(new CTextBox('name', $data['name']))
 			->setAttribute('autocomplete', 'off')
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH),
-		(new CButton('save_query', _('Save')))->addClass(ZBX_STYLE_BTN_ALT)
+		(new CButton('save_query', _('Save')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->setEnabled(trim($data['name']) !== '')
 	]))->addClass('margin-between'))
 ]);
 
@@ -59,7 +61,7 @@ $grid->addItem([
 
 $table = null;
 
-if ($data['preview']) {
+if (array_key_exists('rows', $data)) {
 	$limit = 100;
 	$table = (new CTable)->addClass(ZBX_STYLE_LIST_TABLE);
 
@@ -90,6 +92,14 @@ $form->addItem((new CTabView())
 $widget
 	->addItem(new StyleTag(<<<'CSS'
 		.margin-between > * { vertical-align: middle; margin-right: 5px !important; }
+		.processing::before {
+			position: absolute;
+			top: 0;
+			left: 0;
+			background: rgba(255, 255, 255, 0.7);
+			display: block;
+			content: 'Processing.'
+		}
 
 		/* Codemirror styles */
 		.cm-wrap.cm-focused { outline: 0 none; }

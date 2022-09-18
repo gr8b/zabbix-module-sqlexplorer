@@ -3,42 +3,59 @@
 namespace Modules\SqlExplorer\Actions;
 
 use CProfile;
+use CNewValidator;
+use CSession;
 use CControllerResponseData;
 
 class StoredSql extends BaseAction {
 
+	const QUERIES_PROFILE_KEY = 'module-sqlexplorer-queries';
+
 	protected function checkInput() {
+		if ($this->request_method !== self::POST) {
+			return true;
+		}
+
 		$fields = [
-			'index' => 'int32|ge 0',
-			'query'	=> 'string'
+			'queries'	=> 'required|array'
 		];
+
+		$this->populateJsonInput();
 
 		return $this->validateInput($fields);
 	}
 
+	protected function populateJsonInput() {
+		$input = file_get_contents('php://input');
+		$input = json_decode($input, true);
+		CSession::setValue('formData', $input);
+	}
+
 	public function doAction() {
-		$index = $this->getInput('index', 0);
-		$queries = CProfile::get('module-sqlexplorer-queries', []);
-
-		foreach ($queries as &$query) {
-			$query = json_decode($query, true);
-		}
-		unset($query);
-
-		$data = [
-			'queries' => $queries
-		];
+		$queries = [];
 
 		if ($this->request_method === self::POST) {
-			$queries[$index - 1] = $this->getInput('query', '');
-			$queries = array_map('json_encode', $queries);
-			CProfile::updateArray('module-sqlexplorer-queries', $queries, PROFILE_TYPE_STR);
-			$data['updated'] = $index;
+			$queries = array_values($this->getInput('queries', []));
+			unset($queries[0]);
+
+			if ($queries) {
+				$value = array_values(array_map('json_encode', $queries));
+				CProfile::updateArray(static::QUERIES_PROFILE_KEY, $value, PROFILE_TYPE_STR);
+			}
+			else {
+				CProfile::delete(static::QUERIES_PROFILE_KEY);
+			}
 		}
 		else {
-			array_unshift($data['queries'], ['title' => '', 'query' => '']);
+			$queries = CProfile::get(static::QUERIES_PROFILE_KEY, []);
+
+			foreach ($queries as &$query) {
+				$query = json_decode($query, true);
+			}
+			unset($query);
 		}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+		array_unshift($queries, ['title' => '', 'query' => "\n\n\n"]);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode(['queries' => $queries])]));
 	}
 }
