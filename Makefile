@@ -10,3 +10,6 @@ dev-watch:
 
 docker-init:
 	docker build -t $(DOCKER_IMAGE) ./
+
+zip-release:
+	zip release.zip actions/* public/* views/* helpers/html/* Module.php manifest.json
