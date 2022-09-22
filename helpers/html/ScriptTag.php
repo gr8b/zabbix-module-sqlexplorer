@@ -6,26 +6,26 @@ use Core\CModule as CModule;
 
 class ScriptTag extends RawContent {
 
-	public function __construct($content = null) {
-		parent::__construct('script', true);
-		$this->setAttribute('type', 'text/javascript');
+    public function __construct($content = null) {
+        parent::__construct('script', true);
+        $this->setAttribute('type', 'text/javascript');
 
-		if (is_string($content)) {
-			$this->setRawContent($content);
-		}
-	}
+        if (is_string($content)) {
+            $this->setRawContent($content);
+        }
+    }
 
-	public function setAttribute($attribute, $value) {
-		if ($attribute === 'src') {
-			$this->items = [];
-		}
+    public function setAttribute($attribute, $value) {
+        if ($attribute === 'src') {
+            $this->items = [];
+        }
 
-		return parent::setAttribute($attribute, $value);
-	}
+        return parent::setAttribute($attribute, $value);
+    }
 
-	public function setRawContent($value) {
-		$this->setAttribute('src', null);
+    public function setRawContent($value) {
+        $this->setAttribute('src', null);
 
-		return parent::setRawContent($value);
-	}
+        return parent::setRawContent($value);
+    }
 }
