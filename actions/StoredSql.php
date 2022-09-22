@@ -3,13 +3,13 @@
 namespace Modules\SqlExplorer\Actions;
 
 use CProfile;
-use CNewValidator;
-use CSession;
 use CControllerResponseData;
 
 class StoredSql extends BaseAction {
 
 	const QUERIES_PROFILE_KEY = 'module-sqlexplorer-queries';
+
+	protected $post_content_type = self::TYPE_JSON;
 
 	protected function checkInput() {
 		if ($this->request_method !== self::POST) {
@@ -20,15 +20,7 @@ class StoredSql extends BaseAction {
 			'queries'	=> 'required|array'
 		];
 
-		$this->populateJsonInput();
-
 		return $this->validateInput($fields);
-	}
-
-	protected function populateJsonInput() {
-		$input = file_get_contents('php://input');
-		$input = json_decode($input, true);
-		CSession::setValue('formData', $input);
 	}
 
 	public function doAction() {

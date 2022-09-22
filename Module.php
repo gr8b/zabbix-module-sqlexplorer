@@ -9,8 +9,8 @@ use Core\CModule as CModule;
 use CController as CAction;
 use CMenuItem;
 use Modules\SqlExplorer\Actions\BaseAction;
-use Modules\SqlExplorer\Compatibility\Html\CFormGrid as CFormGridCompat;
-use Modules\SqlExplorer\Compatibility\Html\CFormField as CFormFieldCompat;
+use Modules\SqlExplorer\Helpers\Html\CFormGrid;
+use Modules\SqlExplorer\Helpers\Html\CFormField;
 
 class Module extends CModule {
 
@@ -69,9 +69,9 @@ class Module extends CModule {
 	}
 
 	protected function setCompatibilityMode($version) {
-		if (version_compare($version, '6.2', '<')) {
-			class_alias(CFormGridCompat::class, '\\CFormGrid', true);
-			class_alias(CFormFieldCompat::class, '\\CFormField', true);
+		if (version_compare($version, '6.0', '>=')) {
+			class_alias('\\CFormGrid', CFormGrid::class, true);
+			class_alias('\\CFormField', CFormField::class, true);
 		}
 	}
 }

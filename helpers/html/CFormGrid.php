@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\SqlExplorer\Compatibility\Html;
+namespace Modules\SqlExplorer\Helpers\Html;
 
 use CFormList;
 

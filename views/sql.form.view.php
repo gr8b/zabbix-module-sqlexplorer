@@ -1,6 +1,7 @@
 <?php
 
-use Modules\SqlExplorer\Compatibility\Html\CFormField;
+use Modules\SqlExplorer\Helpers\Html\CFormGrid;
+use Modules\SqlExplorer\Helpers\Html\CFormField;
 use Modules\SqlExplorer\Helpers\Html\StyleTag;
 use Modules\SqlExplorer\Helpers\Html\JsonDataTag;
 use Modules\SqlExplorer\Helpers\Html\ScriptTag;
@@ -8,7 +9,12 @@ use Modules\SqlExplorer\Helpers\Html\ScriptTag;
 $url = (new Curl())
 	->setArgument('action', 'sqlexplorer.form')
 	->getUrl();
-$page_title = sprintf('%s - %s:%s', _('SQL Explorer'), $data['database']['type'], $data['database']['table']);
+$db_label = [
+	ZBX_DB_MYSQL => _('MySQL'),
+	ZBX_DB_POSTGRESQL => _('Postgre'),
+	ZBX_DB_ORACLE => _('Oracle')
+][$data['database']['type']];
+$page_title = sprintf('%s - %s:%s', _('SQL Explorer'), $db_label, $data['database']['table']);
 $widget = (new CWidget())->setTitle($page_title);
 $form = (new CForm('post', $url))
 	->addClass('sqlexplorer-form')
