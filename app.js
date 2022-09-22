@@ -42,7 +42,7 @@ update_button.addEventListener('click', e => {
 delete_button.addEventListener('click', e => {
 	if (confirm(`Delete query "${queries[queries_select.value]?.title}"`)) {
 		delete queries[queries_select.value]
-		queries_select.querySelector(`.list li[value="${queries_select.value}"]`).classList.add('display-none')
+		queries_select.querySelector(`.list li[value="${queries_select.value}"]`).style.display = 'none';
 		queries_select.value = 0
 		saveQueries()
 	}
