@@ -61,7 +61,9 @@ $grid->addItem([
 $grid->addItem([
     new CLabel(_('Query')),
     new CFormField(
-        (new CTextArea('query', $data['query']))->addClass(ZBX_STYLE_DISPLAY_NONE)
+        (new CTextArea('query', $data['query']))
+            ->addClass(ZBX_STYLE_DISPLAY_NONE)
+            ->removeAttribute('maxlength')
     )
 ]);
 

@@ -66,7 +66,9 @@ save_button.addEventListener('click', e => {
         query: editor.state.doc.toString()
     })
     queries_select.value = value
-    saveQueries()
+    saveQueries().then(() => {
+        name_input.value = ''
+    })
 })
 
 function setLoadingState(is_loading) {
@@ -82,7 +84,7 @@ function saveQueries() {
     let sid = form.querySelector('[name="sid"]').value
 
     setLoadingState(true)
-    fetch(`?action=sqlexplorer.queries&sid=${sid}`, {
+    return fetch(`?action=sqlexplorer.queries&sid=${sid}`, {
             method: 'POST',
             body: JSON.stringify({queries: queries.filter(Boolean)})
         })
