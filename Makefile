@@ -1,4 +1,5 @@
 DOCKER_IMAGE=noderollup:latest
+VERSION_TAG=$(shell git describe --tags --abbrev=0)
 
 
 prepare:
@@ -11,5 +12,15 @@ dev-watch:
 docker-init:
 	docker build -t $(DOCKER_IMAGE) ./
 
+tag:
+	@echo "Enter new tag: (v1.4, v2.0, vX.X)"
+	@read VERSION_TAG && \
+	    echo "Creating new tag $$VERSION_TAG" \
+		git tag $$VERSION_TAG -a \
+		git push origin --tags
+	@echo "done"
+
 zip-release:
-	zip release.zip actions/* public/* views/* helpers/html/* Module.php manifest.json
+	@echo "Making module for tag $(VERSION_TAG)"
+	rm -rf $(VERSION_TAG).zip
+	zip $(VERSION_TAG).zip actions/* public/* views/* helpers/* helpers/html/* Module.php manifest.json
