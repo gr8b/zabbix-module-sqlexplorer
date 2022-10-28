@@ -16,9 +16,9 @@ tag:
 	@echo "Latest version $(VERSION_TAG)"
 	@echo "Enter new tag: (v1.4, v2.0, vX.X)"
 	@read VERSION_TAG && \
-	    echo "Creating new tag $$VERSION_TAG" \
-		git tag $$VERSION_TAG -a \
-		git push origin --tags
+	    echo "Creating new tag $$VERSION_TAG" && \
+		git tag $$VERSION_TAG && \
+		git push origin $$VERSION_TAG
 	@echo "done"
 
 zip-release:
