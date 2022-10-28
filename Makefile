@@ -13,12 +13,18 @@ docker-init:
 	docker build -t $(DOCKER_IMAGE) ./
 
 tag:
-	@echo "Latest version $(VERSION_TAG)"
-	@echo "Enter new tag: (v1.4, v2.0, vX.X)"
+	@echo "Current version $(VERSION_TAG)"
+	@echo "Enter new tag: (1.4, 2.0, X.X)"
 	@read VERSION_TAG && \
-	    echo "Creating new tag $$VERSION_TAG" && \
-		git tag $$VERSION_TAG && \
-		git push origin $$VERSION_TAG
+		LAST_TAG=$(VERSION_TAG) && \
+		LAST_TAG="$${LAST_TAG#v}" && \
+		echo "Updating manifest.json file, replace $$LAST_TAG with $$VERSION_TAG" && \
+		sed -i "s/\"version\": \"$$LAST_TAG\"/\"version\": \"$$VERSION_TAG\"/g" manifest.json && \
+		git add manifest.json && \
+		git commit -m "build: adding new tag v$$VERSION_TAG" && \
+		git push && \
+		git tag v$$VERSION_TAG && \
+		git push origin v$$VERSION_TAG
 	@echo "done"
 
 zip-release:
