@@ -7,7 +7,7 @@ use CUrl;
 use CMessageHelper;
 use CControllerResponseData;
 use CControllerResponseRedirect;
-use CProfile;
+use Modules\SqlExplorer\Helpers\ProfileHelper as Profile;
 
 class SqlForm extends BaseAction {
 
@@ -104,8 +104,7 @@ class SqlForm extends BaseAction {
 
         $data['public_path'] = $this->module->getAssetsUrl();
         $data['database'] = $this->module->getDatabase();
-        $queries = array_map('json_decode', CProfile::getArray(StoredSql::QUERIES_PROFILE_KEY, []));
-        $queries = array_map('get_object_vars', $queries);
+        $queries = Profile::get();
         $data['queries'] = array_merge([['title' => '', 'query' => "\n\n\n"]], array_values($queries));
 
         $data['db_schema'] = [];

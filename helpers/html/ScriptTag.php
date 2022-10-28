@@ -2,8 +2,6 @@
 
 namespace Modules\SqlExplorer\Helpers\Html;
 
-use Core\CModule as CModule;
-
 class ScriptTag extends RawContent {
 
     public function __construct($content = null) {
