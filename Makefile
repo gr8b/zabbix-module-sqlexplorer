@@ -13,6 +13,7 @@ docker-init:
 	docker build -t $(DOCKER_IMAGE) ./
 
 tag:
+	@echo "Latest version $(VERSION_TAG)"
 	@echo "Enter new tag: (v1.4, v2.0, vX.X)"
 	@read VERSION_TAG && \
 	    echo "Creating new tag $$VERSION_TAG" \
