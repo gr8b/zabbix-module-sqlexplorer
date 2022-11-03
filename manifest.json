@@ -19,6 +19,11 @@
 		"sqlexplorer.csv": {
 			"class": "SqlForm",
 			"layout": "layout.csv"
+		},
+		"sqlexplorer.config": {
+			"class": "SqlConfig",
+			"layout": "layout.json",
+			"view": "sqlexplorer.config.form"
 		}
 	}
 }

@@ -98,6 +98,7 @@ $form->addItem((new CTabView())
 );
 
 $widget
+    ->setControls([(new CButton('sqlexplorer.config', _('Configuration')))->addClass(ZBX_STYLE_BTN_ALT)])
     ->addItem(new StyleTag(<<<'CSS'
         .margin-between > * { vertical-align: middle; margin-right: 5px !important; }
         /* Codemirror styles */

@@ -11,7 +11,11 @@ const name_input = form.querySelector('input[name="name"]')
 const update_button = form.querySelector('#update_query')
 const delete_button = form.querySelector('#delete_query')
 const save_button = form.querySelector('#save_query')
+const config_button = document.getElementById('sqlexplorer.config')
 
+config_button.addEventListener('click', () => {
+    PopUp('sqlexplorer.config', {}, null, config_button);
+})
 document.getElementById('csv').addEventListener('click', function() {
     form.setAttribute('action', 'zabbix.php?action=sqlexplorer.csv')
     setLoadingState(true)
