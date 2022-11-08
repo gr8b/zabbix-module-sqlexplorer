@@ -33,6 +33,12 @@ queries_select.addEventListener('change', function() {
         query_textbox.dispatchEvent(new Event('change'))
         update_button.removeAttribute('disabled')
         delete_button.removeAttribute('disabled')
+
+        const autoexec = document.querySelector('[type="hidden"][name="autoexec"]').value;
+
+        if (autoexec - 0) {
+            form.querySelector('[name="preview"]').click()
+        }
     }
     else {
         update_button.setAttribute('disabled', 'disabled')

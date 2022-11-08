@@ -18,16 +18,12 @@ $page_title = sprintf('%s - %s:%s', _('SQL Explorer'), $db_label, $data['databas
 $widget = (new CWidget())->setTitle($page_title);
 $form = (new CForm('post', $url))
     ->addClass('sqlexplorer-form')
+    ->addVar('text_to_url', $data['text_to_url'])
+    ->addVar('autoexec', $data['autoexec'])
+    ->addVar('add_column_names', $data['add_column_names'])
     ->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 $grid = new CFormGrid();
-
-$grid->addItem([
-    new CLabel(_('Column names as first row')),
-    new CFormField(
-        (new CCheckBox('add_column_names', 1))->setChecked((bool) $data['add_column_names'])
-    )
-]);
 
 $grid->addItem([
     new CLabel(_('Saved SQL')),
@@ -86,7 +82,24 @@ if (array_key_exists('rows', $data)) {
         ));
     }
 
-    array_map([$table, 'addRow'], array_slice($data['rows'], 0, $limit - 1));
+    $regex = '/^(?<file>[a-z0-9]+\\.php)(\\?(?<params>.+)){0,1}$/';
+    foreach (array_slice($data['rows'], 0, $limit - 1) as $row) {
+        if ($data['text_to_url']) {
+            foreach ($row as &$col) {
+                $match = [];
+                $params = [];
+
+                if (trim($col) !== ''
+                        && preg_match($regex, trim($col), $match, PREG_UNMATCHED_AS_NULL)) {
+                    parse_str((string) $match['params'], $params);
+                    $url = new CUrl(trim($col));
+                    $col = new CCol(new CLink($params ? end($params) : 'link', $url->toString()));
+                }
+            }
+        }
+
+        $table->addRow($row);
+    }
 }
 
 $form->addItem((new CTabView())

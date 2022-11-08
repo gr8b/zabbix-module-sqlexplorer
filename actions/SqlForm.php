@@ -22,7 +22,7 @@ class SqlForm extends BaseAction {
             return [
                 'fav' => 'int32',
                 'query' => 'string|required|not_empty',
-                'add_column_names' => 'in 1'
+                'add_column_names' => 'in 0,1'
             ];
         }
 
@@ -30,17 +30,19 @@ class SqlForm extends BaseAction {
             'fav' => 'int32',
             'name' => 'string',
             'query' => 'string',
-            'add_column_names' => 'in 1',
-            'preview' => 'in 1'
+            'add_column_names' => 'in 0,1',
+            'preview' => 'in 0,1'
         ];
     }
 
     protected function doAction() {
         $data = [
             'fav' => 0,
+            'text_to_url' => Profile::getPersonal(Profile::KEY_TEXT_TO_URL, 1),
+            'autoexec' => Profile::getPersonal(Profile::KEY_AUTOEXEC_SQL, 0),
             'name' => '',
             'query'	 => "\n\n\n",
-            'add_column_names' => 0
+            'add_column_names' => Profile::getPersonal(Profile::KEY_SHOW_HEADER, 0)
         ];
         $this->getInputs($data, array_keys($data));
 

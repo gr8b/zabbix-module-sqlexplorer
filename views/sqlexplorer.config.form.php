@@ -5,47 +5,99 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
-	->addVar('action', $data['action'])
-	->addVar('refresh', 1);
+    ->cleanItems()
+    ->addVar('action', $data['action'])
+    ->addVar('refresh', 1)
+    ->addVar('text_to_url', 0)
+    ->addVar('autoexec', 0)
+    ->addVar('add_column_names', 0);
 
 $form_list = (new CFormList())
-	->addRow(
-        new CLabel(_('Convert URL text into clickable links'), 'clickable_url'),
-		(new CCheckBox('clickable_url', 1))->setChecked($data['clickable_url'])
-	)
-	->addRow(
-        new CLabel(_('Automatically execute selected SQL'), 'autoexecute_query'),
-		(new CCheckBox('autoexecute_query', 1))->setChecked($data['autoexecute_query'])
-	)
-	->addRow(
+    ->addRow(
+        new CLabel(_('Convert URL text into clickable links'), 'text_to_url'),
+        (new CCheckBox('text_to_url', 1))->setChecked((bool) $data['text_to_url'])
+    )
+    ->addRow(
+        new CLabel(_('Automatically execute selected SQL'), 'autoexec'),
+        (new CCheckBox('autoexec', 1))->setChecked((bool) $data['autoexec'])
+    )
+    ->addRow(
+        new CLabel(_('Column names as first row')),
+        (new CCheckBox('add_column_names', 1))->setChecked((bool) $data['add_column_names'])
+    )
+    ->addRow(
         new CLabel(_('Stop words list'), 'stopwords'),
-		(new CTextBox('stopwords', implode(',', $data['stopwords'])))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-	);
+        (new CTextBox('stopwords', implode(',', $data['stopwords'])))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+    );
 
 $form
-	->addItem($form_list)
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+    ->addItem($form_list)
+    ->addItem((new CInput('submit', 'submit', 1))->addStyle('display: none;'));
 
-$output = [
-	'header' => $data['title'],
-	'body' => (new CDiv([$data['errors'], $form]))->toString(),
-	'buttons' => [
-		[
-			'title' => _('Apply'),
-			'class' => 'dialogue-widget-save',
-			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'return submitMaintenancePeriod(overlay);'
-		]
-	],
-	'params' => $data['params'],
-	// 'script_inline' => $this->readJsFile('popup.maintenance.period.js.php')
-];
+$js_submit_handler = <<<'JS'
+function submitModuleConfig(overlay) {
+    const form = overlay.$dialogue[0].querySelector('form');
+    const url = new Curl(form.getAttribute('action'));
+    const data = new URLSearchParams(new FormData(form));
+    const error_container = overlay.$dialogue[0].querySelector('[data-error-container]');
+
+    error_container.innerHTML = '';
+    overlay.setLoading();
+    overlay.xhr = (function() {
+        const controller = new AbortController();
+        const req = fetch(url.getUrl(), {signal: controller.signal, method: 'POST', body: data})
+            .then(r => r.json())
+            .then(json => {
+                overlay.unsetLoading();
+
+                if (json.errors) {
+                    error_container.innerHTML = json.errors;
+                }
+                else {
+                    overlayDialogueDestroy(overlay.dialogueid);
+                    Object.entries(json.params).forEach(([key, value]) => {
+                        document.querySelector(`[type="hidden"][name="${key}"]`).value = value;
+                    });
+                }
+            })
+            .catch(error => {
+                overlay.unsetLoading();
+                error_container.innerHTML = error;
+            });
+
+        this.abort = () => controller.abort();
+
+        return this;
+    })();
+}
+JS;
+
+if ($data['params']) {
+    $output = [
+        'params' => $data['params']
+    ];
+}
+else {
+    $output = [
+        'header' => $data['title'],
+        'body' => (new CDiv([(new CDiv($data['errors']))->setAttribute('data-error-container', 1), $form]))->toString(),
+        'buttons' => [
+            [
+                'title' => _('Apply'),
+                'class' => 'dialogue-widget-save',
+                'keepOpen' => true,
+                'isSubmit' => true,
+                'action' => 'return submitModuleConfig(overlay);'
+            ]
+        ],
+        'params' => $data['params'],
+        'script_inline' => $js_submit_handler
+    ];
+}
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
+    CProfiler::getInstance()->stop();
+    $output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
 echo json_encode($output);

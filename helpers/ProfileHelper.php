@@ -4,10 +4,37 @@ namespace Modules\SqlExplorer\Helpers;
 
 use DB;
 use CProfile;
+use CWebUser;
 
 class ProfileHelper {
 
-    const QUERIES_PROFILE_KEY = 'module-sqlexplorer-queries';
+    const PREFIX = 'module-sqlexplorer-';
+
+    const KEY_QUERIES_PROFILE = 'queries';
+    const KEY_TEXT_TO_URL = 'texturl';
+    const KEY_AUTOEXEC_SQL = 'autoexec';
+    const KEY_SHOW_HEADER = 'header';
+    // const KEY_STOP_WORDS = 'stopwords';
+
+    /**
+     * Get current user profile preference
+     *
+     * @param string $key      Preference name.
+     * @param string $default  Default value when preference not set in profile.
+     */
+    public static function getPersonal($key, $default = null) {
+        return CProfile::get(static::PREFIX.$key, $default, CWebUser::$data['userid']);
+    }
+
+    /**
+     * Update current user profile preference.
+     *
+     * @param string $key    Preference name.
+     * @param string $value  Value string to store, can be anything with length of up to 255 characters
+     */
+    public static function updatePersonal($key, $value) {
+        return CProfile::update(static::PREFIX.$key, $value, PROFILE_TYPE_STR, CWebUser::$data['userid']);
+    }
 
     /**
      * Get stored SQL queries from profile.
@@ -20,7 +47,7 @@ class ProfileHelper {
         $queries = [];
         $query = '';
 
-        foreach (CProfile::getArray(static::QUERIES_PROFILE_KEY, []) as $query_chunk) {
+        foreach (CProfile::getArray(static::PREFIX.static::KEY_QUERIES_PROFILE, []) as $query_chunk) {
             $query .= $query_chunk;
             $decoded_query = json_decode($query, true);
 
@@ -38,7 +65,7 @@ class ProfileHelper {
      */
     public static function updateQueries(array $queries): void {
         if (!$queries) {
-            CProfile::delete(static::QUERIES_PROFILE_KEY);
+            CProfile::delete(static::PREFIX.static::KEY_QUERIES_PROFILE);
 
             return;
         }
@@ -61,6 +88,6 @@ class ProfileHelper {
             }
         }
 
-        CProfile::updateArray(static::QUERIES_PROFILE_KEY, $encoded_queries, PROFILE_TYPE_STR);
+        CProfile::updateArray(static::PREFIX.static::KEY_QUERIES_PROFILE, $encoded_queries, PROFILE_TYPE_STR);
     }
 }
