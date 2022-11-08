@@ -104,7 +104,7 @@ class SqlForm extends BaseAction {
 
         $data['public_path'] = $this->module->getAssetsUrl();
         $data['database'] = $this->module->getDatabase();
-        $queries = Profile::get();
+        $queries = Profile::getQueries();
         $data['queries'] = array_merge([['title' => '', 'query' => "\n\n\n"]], array_values($queries));
 
         $data['db_schema'] = [];

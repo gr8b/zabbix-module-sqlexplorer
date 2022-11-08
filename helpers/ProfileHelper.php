@@ -16,7 +16,7 @@ class ProfileHelper {
      *              []['title']  stored query name.
      *              []['query']  stored query SQL.
      */
-    public static function get(): array {
+    public static function getQueries(): array {
         $queries = [];
         $query = '';
 
@@ -36,7 +36,7 @@ class ProfileHelper {
     /**
      * Store queries in profile table.
      */
-    public static function update(array $queries): void {
+    public static function updateQueries(array $queries): void {
         if (!$queries) {
             CProfile::delete(static::QUERIES_PROFILE_KEY);
 

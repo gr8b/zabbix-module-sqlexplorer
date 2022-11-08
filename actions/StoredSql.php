@@ -27,10 +27,10 @@ class StoredSql extends BaseAction {
         if ($this->request_method === self::POST) {
             $queries = array_values($this->getInput('queries', []));
             unset($queries[0]);
-            Profile::update($queries);
+            Profile::updateQueries($queries);
         }
         else {
-            $queries = Profile::get();
+            $queries = Profile::getQueries();
         }
 
         array_unshift($queries, ['title' => '', 'query' => "\n\n\n"]);
