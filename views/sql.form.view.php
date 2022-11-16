@@ -21,6 +21,7 @@ $form = (new CForm('post', $url))
     ->addVar('text_to_url', $data['text_to_url'])
     ->addVar('autoexec', $data['autoexec'])
     ->addVar('add_column_names', $data['add_column_names'])
+    ->addVar('stopwords', $data['stopwords'])
     ->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 $grid = new CFormGrid();
@@ -33,22 +34,22 @@ $grid->addItem([
             ->setValue($data['fav'])
             ->addOptions(CSelect::createOptionsFromArray(array_column($data['queries'], 'title')))
             ->setWidth(ZBX_TEXTAREA_BIG_WIDTH),
-        (new CButton('update_query', _('Update')))
-            ->addClass(ZBX_STYLE_BTN_ALT)
-            ->setEnabled($data['fav'] > 0),
         (new CButton('delete_query', _('Remove')))
             ->addClass(ZBX_STYLE_BTN_ALT)
-            ->setEnabled($data['fav'] > 0)
+            ->setEnabled($data['fav'] > 0),
     ]))->addClass('margin-between'))
 ]);
 
 $grid->addItem([
-    new CLabel(_('Save query as')),
+    null,
     new CFormField((new CDiv([
         (new CTextBox('name', $data['name']))
             ->setAttribute('autocomplete', 'off')
             ->setWidth(ZBX_TEXTAREA_BIG_WIDTH),
-        (new CButton('save_query', _('Save')))
+        (new CButton('update_query', _('Update')))
+            ->addClass(ZBX_STYLE_BTN_ALT)
+            ->setEnabled($data['fav'] > 0),
+        (new CButton('save_query', _('New')))
             ->addClass(ZBX_STYLE_BTN_ALT)
             ->setEnabled(trim($data['name']) !== '')
     ]))->addClass('margin-between'))
@@ -82,7 +83,7 @@ if (array_key_exists('rows', $data)) {
         ));
     }
 
-    $regex = '/^(?<file>[a-z0-9]+\\.php)(\\?(?<params>.+)){0,1}$/';
+    $regex = '/^(?<file>[a-z0-9_]+\\.php)(\\?(?<params>.+)){0,1}$/';
     foreach (array_slice($data['rows'], 0, $limit - 1) as $row) {
         if ($data['text_to_url']) {
             foreach ($row as &$col) {

@@ -29,10 +29,8 @@ class StoredSql extends BaseAction {
             unset($queries[0]);
             Profile::updateQueries($queries);
         }
-        else {
-            $queries = Profile::getQueries();
-        }
 
+        $queries = Profile::getQueries();
         array_unshift($queries, ['title' => '', 'query' => "\n\n\n"]);
         $this->setResponse(new CControllerResponseData(['main_block' => json_encode(['queries' => $queries])]));
     }

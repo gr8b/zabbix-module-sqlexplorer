@@ -12,9 +12,10 @@ const update_button = form.querySelector('#update_query')
 const delete_button = form.querySelector('#delete_query')
 const save_button = form.querySelector('#save_query')
 const config_button = document.getElementById('sqlexplorer.config')
+const stopwords = document.querySelector('[name="stopwords"]')
 
 config_button.addEventListener('click', () => {
-    PopUp('sqlexplorer.config', {}, null, config_button);
+    PopUp('sqlexplorer.config', {}, null, config_button)
 })
 document.getElementById('csv').addEventListener('click', function() {
     form.setAttribute('action', 'zabbix.php?action=sqlexplorer.csv')
@@ -22,8 +23,16 @@ document.getElementById('csv').addEventListener('click', function() {
     form.submit()
     setTimeout(() => setLoadingState(false), 1000)
 });
-document.getElementById('preview').addEventListener('click', function() {
+document.getElementById('preview').addEventListener('click', function(e) {
     form.setAttribute('action', 'zabbix.php?action=sqlexplorer.form')
+
+    if (checkStopWords(query_textbox.value) == false) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        return false
+    }
+
     setLoadingState(true)
     form.submit()
 });
@@ -70,14 +79,15 @@ name_input.addEventListener('keyup', e => {
 save_button.addEventListener('click', e => {
     let value = queries.length
 
-    queries_select.addOption({value, label: name_input.value})
     queries.push({
         title: name_input.value,
         query: editor.state.doc.toString()
     })
-    queries_select.value = value
-    saveQueries().then(() => {
+    saveQueries().then(json => {
         name_input.value = ''
+
+        queries_select.addOption({value, label: name_input.value})
+        queries_select.value = value
     })
 })
 
@@ -98,9 +108,20 @@ function saveQueries() {
             method: 'POST',
             body: JSON.stringify({queries: queries.filter(Boolean)})
         })
+        .then(resp => resp.json())
         .finally(e => {
             setLoadingState(false)
         })
+}
+
+function checkStopWords(query) {
+    const match = [...stopwords.value.matchAll(/\w+/g)].filter(match => query.match(new RegExp(match[0], 'i')))
+
+    if (match.length) {
+        return confirm(`Are you sure to execute query: "${query}"`)
+    }
+
+    return true
 }
 
 // https://www.raresportan.com/how-to-make-a-code-editor-with-codemirror6/

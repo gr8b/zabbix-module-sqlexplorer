@@ -42,7 +42,8 @@ class SqlForm extends BaseAction {
             'autoexec' => Profile::getPersonal(Profile::KEY_AUTOEXEC_SQL, 0),
             'name' => '',
             'query'	 => "\n\n\n",
-            'add_column_names' => Profile::getPersonal(Profile::KEY_SHOW_HEADER, 0)
+            'add_column_names' => Profile::getPersonal(Profile::KEY_SHOW_HEADER, 0),
+            'stopwords' => Profile::getPersonal(Profile::KEY_STOP_WORDS, Profile::DEFAULT_STOP_WORDS)
         ];
         $this->getInputs($data, array_keys($data));
 

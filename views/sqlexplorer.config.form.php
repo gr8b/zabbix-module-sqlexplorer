@@ -27,7 +27,7 @@ $form_list = (new CFormList())
     )
     ->addRow(
         new CLabel(_('Stop words list'), 'stopwords'),
-        (new CTextBox('stopwords', implode(',', $data['stopwords'])))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+        (new CTextBox('stopwords', $data['stopwords']))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
     );
 
 $form
