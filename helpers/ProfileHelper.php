@@ -12,12 +12,13 @@ class ProfileHelper {
     const PREFIX = 'module-sqlexplorer-';
 
     const KEY_QUERIES_PROFILE = 'queries';
+    const KEY_TAB_URL = 'tab_url';
     const KEY_TEXT_TO_URL = 'texturl';
     const KEY_AUTOEXEC_SQL = 'autoexec';
     const KEY_SHOW_HEADER = 'header';
     const KEY_STOP_WORDS = 'stopwords';
 
-    const DEFAULT_STOP_WORDS = 'insert delete truncate reate drop';
+    const DEFAULT_STOP_WORDS = 'insert delete truncate create drop';
     /**
      * Get current user profile preference
      *

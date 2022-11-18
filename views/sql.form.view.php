@@ -94,7 +94,9 @@ if (array_key_exists('rows', $data)) {
                         && preg_match($regex, trim($col), $match, PREG_UNMATCHED_AS_NULL)) {
                     parse_str((string) $match['params'], $params);
                     $url = new CUrl(trim($col));
-                    $col = new CCol(new CLink($params ? end($params) : 'link', $url->toString()));
+                    $col = new CCol((new CLink($params ? end($params) : 'link', $url->toString()))
+                        ->setAttribute('target', $data['tab_url'] ? '_blank' : null)
+                    );
                 }
             }
         }

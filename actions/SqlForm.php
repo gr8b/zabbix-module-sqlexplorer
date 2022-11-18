@@ -38,6 +38,7 @@ class SqlForm extends BaseAction {
     protected function doAction() {
         $data = [
             'fav' => 0,
+            'tab_url' => Profile::getPersonal(Profile::KEY_TAB_URL, 0),
             'text_to_url' => Profile::getPersonal(Profile::KEY_TEXT_TO_URL, 1),
             'autoexec' => Profile::getPersonal(Profile::KEY_AUTOEXEC_SQL, 0),
             'name' => '',

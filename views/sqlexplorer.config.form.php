@@ -8,6 +8,7 @@ $form = (new CForm())
     ->cleanItems()
     ->addVar('action', $data['action'])
     ->addVar('refresh', 1)
+    ->addVar('tab_url', 0)
     ->addVar('text_to_url', 0)
     ->addVar('autoexec', 0)
     ->addVar('add_column_names', 0);
@@ -16,6 +17,10 @@ $form_list = (new CFormList())
     ->addRow(
         new CLabel(_('Convert URL text into clickable links'), 'text_to_url'),
         (new CCheckBox('text_to_url', 1))->setChecked((bool) $data['text_to_url'])
+    )
+    ->addRow(
+        new CLabel(_('Open URL in new tab'), 'tab_url'),
+        (new CCheckBox('tab_url', 1))->setChecked((bool) $data['tab_url'])
     )
     ->addRow(
         new CLabel(_('Automatically execute selected SQL'), 'autoexec'),

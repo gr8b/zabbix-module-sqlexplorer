@@ -30,12 +30,10 @@ abstract class BaseAction extends Action {
 
         if (version_compare(ZABBIX_VERSION, '6.0', '<')) {
             if ($this->post_content_type == self::TYPE_JSON) {
-                $input = json_decode(file_get_contents('php://input'), true);
-                \CSession::setValue('formData', $input);
+                $_REQUEST = array_merge($_REQUEST, json_decode(file_get_contents('php://input'), true));
             }
         }
         else {
-            // Fix for broken visibility - private vs public.
             $this->setPostContentType($this->post_content_type);
         }
     }
