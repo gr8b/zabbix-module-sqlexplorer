@@ -35,5 +35,5 @@ tag:
 zip-release:
 	@echo "Making module for tag $(VERSION_TAG)"
 	rm -rf $(VERSION_TAG).zip
-	$(MAKEFILE) buildjs
+	$(MAKE) buildjs
 	zip $(VERSION_TAG).zip actions/* public/* views/* helpers/* helpers/html/* Module.php manifest.json
