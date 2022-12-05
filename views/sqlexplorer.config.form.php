@@ -61,7 +61,11 @@ function submitModuleConfig(overlay) {
                 else {
                     overlayDialogueDestroy(overlay.dialogueid);
                     Object.entries(json.params).forEach(([key, value]) => {
-                        document.querySelector(`[type="hidden"][name="${key}"]`).value = value;
+                        let input = document.querySelector(`[type="hidden"][name="${key}"]`);
+
+                        if (input !== null) {
+                            input.value = json.params[key];
+                        }
                     });
                 }
             })
