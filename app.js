@@ -24,7 +24,7 @@ document.getElementById('csv').addEventListener('click', function() {
 document.getElementById('preview').addEventListener('click', function(e) {
     form.setAttribute('action', 'zabbix.php?action=sqlexplorer.form')
 
-    if (checkStopWords(query_textbox.value) == false) {
+    if (checkStopWords(editor.state.doc.toString()) == false) {
         e.preventDefault()
         e.stopPropagation()
 
@@ -116,7 +116,7 @@ function checkStopWords(query) {
     const match = [...stopwords.value.matchAll(/\w+/g)].filter(match => query.match(new RegExp(match[0], 'i')))
 
     if (match.length) {
-        return confirm(`Are you sure to execute query: "${query}"`)
+        return confirm(`Are you sure to execute query: "${query.replace(/\s+$/, '')}"`)
     }
 
     return true
