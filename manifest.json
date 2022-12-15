@@ -4,7 +4,7 @@
 	"name": "SQL Explorer",
 	"author": "gr8b",
 	"description": "Make SQL queries and export results to .csv files",
-	"version": "1.6",
+	"version": "1.7",
 	"namespace": "SqlExplorer",
 	"url": "https://github.com/gr8b/zabbix-module-sqlexplorer",
 	"actions": {
