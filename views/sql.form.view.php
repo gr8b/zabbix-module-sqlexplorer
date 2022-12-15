@@ -121,7 +121,7 @@ $widget
         .cm-wrap.cm-focused { outline: 0 none; }
         .cm-wrap { border: 1px solid silver; }
         .cm-scroller { font-family: Consolas, Menlo, Monaco, source-code-pro, Courier New, monospace !important; font-size: 12px; }
-    CSS
+CSS
     ))
     ->addItem(new JsonDataTag('page-json', [
         'dark_theme' => in_array(getUserTheme(CWebUser::$data), ['dark-theme']),
