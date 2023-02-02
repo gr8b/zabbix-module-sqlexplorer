@@ -9,8 +9,12 @@ export to `.csv` is done without limiting rows count.
 
 ### Compatibility and Zabbix support
 
-Module is designed to work with Zabbix 5.0 till Zabbix 6.2.
+Module is designed to work with Zabbix 5.0.0 up to Zabbix 6.2.x included.
 
 ### Development
 
 Clone repository, run `make docker-init prepare` to build docker image and initialize nodejs modules, then can use `make dev-watch` to rebuild javascript automatically when `app.js` file is changed.
+
+### Thanks
+
+[Aigars Kadikis](https://github.com/aigarskadikis/) for great ideas, testing and interest in module.
