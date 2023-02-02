@@ -67,24 +67,22 @@ $grid->addItem([
 $table = null;
 
 if (array_key_exists('rows', $data)) {
-    $limit = 100;
     $table = (new CTable)->addClass(ZBX_STYLE_LIST_TABLE);
 
-    if ($data['add_column_names']) {
-        $table->setHeader(array_shift($data['rows']));
+    if ($data['add_column_names'] && $data['rows']) {
+        $table->setHeader(array_keys($data['rows'][0]));
     }
 
-    if (array_key_exists($limit, $data['rows'])) {
-        $total = count($data['rows']);
+    if ($data['rows_count'] > $data['rows_limit']) {
         $table->setFooter(new CRow(
-            (new CCol(_s('Displaying %1$s of %2$s found', $limit, $total)))
+            (new CCol(_s('Displaying %1$s of %2$s found', $data['rows_limit'], $data['rows_count'])))
                 ->setColSpan(count(array_keys($data['rows'][0])))
                 ->addClass(ZBX_STYLE_RIGHT)
         ));
     }
 
     $regex = '/^(?<file>[a-z0-9_]+\\.php)(\\?(?<params>.+)){0,1}$/';
-    foreach (array_slice($data['rows'], 0, $limit - 1) as $row) {
+    foreach ($data['rows'] as $row) {
         if ($data['text_to_url']) {
             foreach ($row as &$col) {
                 $match = [];

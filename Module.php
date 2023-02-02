@@ -52,7 +52,7 @@ class Module extends CModule {
     }
 
     public function getAssetsUrl() {
-        return 'modules/'.basename($this->getDir()).'/public/';
+        return 'modules/'.basename(__DIR__).'/public/';
     }
 
     protected function registerMenuEntry() {

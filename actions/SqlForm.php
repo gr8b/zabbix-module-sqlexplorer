@@ -7,6 +7,7 @@ use CUrl;
 use CMessageHelper;
 use CControllerResponseData;
 use CControllerResponseRedirect;
+use CSettingsHelper;
 use Modules\SqlExplorer\Helpers\ProfileHelper as Profile;
 
 class SqlForm extends BaseAction {
@@ -96,9 +97,11 @@ class SqlForm extends BaseAction {
         if ($this->hasInput('preview')) {
             $cursor = DBselect($data['query']);
             $data['rows'] = $cursor === false ? [] : DBfetchArray($cursor);
+            $data['rows_limit'] = $this->getGuiSearchLimit();
+            $data['rows_count'] = count($data['rows']);
 
-            if ($data['rows'] && $data['add_column_names']) {
-                array_unshift($data['rows'], array_keys($data['rows'][0]));
+            if ($data['rows_count'] > $data['rows_limit']) {
+                $data['rows'] = array_slice($data['rows'], 0, $data['rows_limit']);
             }
 
             if (version_compare(ZABBIX_VERSION, '6.0', '<')) {
@@ -129,5 +132,13 @@ class SqlForm extends BaseAction {
         $response->setTitle(_('SQL Explorer'));
 
         return $response;
+    }
+
+    public function getGuiSearchLimit() {
+        if (version_compare(ZABBIX_VERSION, '5.2', '>=')) {
+            return CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+        }
+
+        return select_config()['search_limit'];
     }
 }

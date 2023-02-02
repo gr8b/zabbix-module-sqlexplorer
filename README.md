@@ -4,6 +4,8 @@
 
 Module allow to make queries to database and export result as `.csv` file. Queries can be saved and reused later.
 Codemirror is used as query editor. It supports SQL syntax highlight and database table column names autocompletion.
+Use *"Administration -> General -> GUI -> Limit for search and filter results"* to configure max rows count to be displayed,
+export to `.csv` is done without limiting rows count.
 
 ### Compatibility and Zabbix support
 
