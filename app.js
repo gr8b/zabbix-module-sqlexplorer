@@ -53,7 +53,7 @@ queries_select.addEventListener('change', function() {
     }
 })
 update_button.addEventListener('click', e => {
-    queries[queries_select.value].query = query_textbox.value
+    queries[queries_select.value].query = editor.state.doc.toString()
     saveQueries()
 })
 delete_button.addEventListener('click', e => {
