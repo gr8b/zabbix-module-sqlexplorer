@@ -7,7 +7,7 @@ Codemirror is used as query editor. It supports SQL syntax highlight and databas
 
 ### Compatibility and Zabbix support
 
-Module is designed to work with Zabbix 5.0 and newer.
+Module is designed to work with Zabbix 5.0 till Zabbix 6.2.
 
 ### Development
 
