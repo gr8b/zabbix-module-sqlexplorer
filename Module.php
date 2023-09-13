@@ -2,6 +2,11 @@
 
 namespace Modules\SqlExplorer;
 
+if (version_compare(ZABBIX_VERSION, '6.4.0', '>')) {
+    class_alias('\Zabbix\Core\CModule', '\Core\CModule');
+    class_alias('\CHtmlPage', '\CWidget');
+}
+
 use APP;
 use CMenu;
 use CWebUser;
@@ -52,6 +57,10 @@ class Module extends CModule {
     }
 
     public function getAssetsUrl() {
+        if (method_exists($this, 'getRelativePath')) {
+            return $this->getRelativePath().'/public/';
+        }
+
         return 'modules/'.basename(__DIR__).'/public/';
     }
 

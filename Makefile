@@ -3,7 +3,7 @@ VERSION_TAG=$(shell git describe --tags --abbrev=0)
 
 
 prepare:
-	docker run --rm -it -v $(shell pwd):/app -w /app $(DOCKER_IMAGE) npm install
+	docker run --rm -it -v $(shell pwd):/app -w /app $(DOCKER_IMAGE) npm install --no-optional
 
 dev-watch:
 	docker run --rm -it --user `id -u`:`id -g` -v $(shell pwd):/app -w /app \
@@ -12,7 +12,7 @@ dev-watch:
 # TODO: add https://www.npmjs.com/package/rollup-plugin-uglify
 buildjs:
 	docker run --rm -it --user `id -u`:`id -g` -v $(shell pwd):/app -w /app \
-		$(DOCKER_IMAGE) rollup app.js -f iife -o ./public/app.min.js -p @rollup/plugin-node-resolve --compat
+		$(DOCKER_IMAGE) rollup app.js -f iife -o ./public/app.min.js -p @rollup/plugin-node-resolve --compact
 
 docker-init:
 	docker build -t $(DOCKER_IMAGE) ./

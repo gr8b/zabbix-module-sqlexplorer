@@ -41,4 +41,12 @@ abstract class BaseAction extends Action {
     protected function checkPermissions() {
         return CWebUser::getType() == USER_TYPE_SUPER_ADMIN;
     }
+
+    protected function disableSIDvalidation() {
+        if (version_compare(ZABBIX_VERSION, '6.4.0', '<')) {
+            return parent::disableSIDvalidation();
+        }
+
+        return $this->disableCsrfValidation();
+    }
 }

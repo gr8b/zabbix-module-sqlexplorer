@@ -13,6 +13,10 @@ $form = (new CForm())
     ->addVar('autoexec', 0)
     ->addVar('add_column_names', 0);
 
+if (version_compare(ZABBIX_VERSION, '6.4.0', '>=')) {
+    $form->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sqlexplorer')))->removeId());
+}
+
 $form_list = (new CFormList())
     ->addRow(
         new CLabel(_('Convert URL text into clickable links'), 'text_to_url'),
