@@ -1,12 +1,12 @@
 {
-	"manifest_version": 2,
+	"manifest_version": 1,
 	"id": "sqlexplorer",
 	"name": "SQL Explorer",
 	"author": "gr8b",
 	"description": "Make SQL queries and export results to .csv files",
-	"version": "2.7",
+	"version": "1.8",
 	"namespace": "SqlExplorer",
-	"url": "https://github.com/gr8b/zabbix-module-sqlexplorer/tree/v2",
+	"url": "https://github.com/gr8b/zabbix-module-sqlexplorer",
 	"actions": {
 		"sqlexplorer.form": {
 			"class": "SqlForm",

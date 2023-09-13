@@ -34,6 +34,10 @@ tag:
 
 zip-release:
 	@echo "Making module for tag $(VERSION_TAG)"
-	rm -rf $(VERSION_TAG).zip
+	rm -rf $(VERSION_TAG)-5.0.zip
+	rm -rf $(VERSION_TAG)-6.4.zip
 	$(MAKE) buildjs
-	zip $(VERSION_TAG).zip actions/* public/* views/* helpers/* helpers/html/* Module.php manifest.json
+	zip $(VERSION_TAG)-5.0.zip actions/* public/* views/* helpers/* helpers/html/* Module.php manifest.json
+	sed -i "s/\"manifest_version\": 1/\"manifest_version\": 2/g" manifest.json
+	zip $(VERSION_TAG)-6.4.zip actions/* public/* views/* helpers/* helpers/html/* Module.php manifest.json
+	sed -i "s/\"manifest_version\": 2/\"manifest_version\": 1/g" manifest.json
