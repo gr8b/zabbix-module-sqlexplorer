@@ -57,11 +57,9 @@ class Module extends CModule {
     }
 
     public function getAssetsUrl() {
-        if (method_exists($this, 'getRelativePath')) {
-            return $this->getRelativePath().'/public/';
-        }
-
-        return 'modules/'.basename(__DIR__).'/public/';
+        return version_compare(ZABBIX_VERSION, '6.4', '>=')
+            ? $this->getRelativePath().'/public/'
+            : 'modules/'.basename($this->getDir()).'/public/';
     }
 
     protected function registerMenuEntry() {

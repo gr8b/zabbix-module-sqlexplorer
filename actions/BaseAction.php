@@ -42,7 +42,7 @@ abstract class BaseAction extends Action {
         return CWebUser::getType() == USER_TYPE_SUPER_ADMIN;
     }
 
-    protected function disableSIDvalidation() {
+    public function disableSIDvalidation() {
         if (version_compare(ZABBIX_VERSION, '6.4.0', '<')) {
             return parent::disableSIDvalidation();
         }

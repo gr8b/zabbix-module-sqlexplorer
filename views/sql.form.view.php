@@ -116,23 +116,13 @@ $form->addItem((new CTabView())
         [new CButton('csv', _('CSV'))]
     ))
 );
-
-$controls = [
-    (new CButton('sqlexplorer.config', _('Configuration')))->addClass(ZBX_STYLE_BTN_ALT)
-];
-
-if (version_compare(ZABBIX_VERSION, '6.4.0', '>=')) {
-    $csrf_token = '';
-
-    $controls = (new CTag('nav', true,
-    (new CForm())
-        ->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sqlexplorer')))->removeId())
-        ->addItem(new CList($controls))
-    ))->setAttribute('aria-label', _('Content controls'));
-}
-
+$controls = [(new CButton('sqlexplorer.config', _('Configuration')))->addClass(ZBX_STYLE_BTN_ALT)];
 $widget
-    ->setControls($controls)
+    ->setControls(
+        version_compare(ZABBIX_VERSION, '6.4.0', '>=')
+        ? (new CTag('nav', true, new CList($controls)))->setAttribute('aria-label', _('Content controls'))
+        : $controls
+    )
     ->addItem(new StyleTag(<<<'CSS'
 .margin-between > * { vertical-align: middle; margin-right: 5px !important; }
 /* Codemirror styles */
