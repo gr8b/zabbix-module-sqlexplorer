@@ -1,5 +1,5 @@
 {
-	"manifest_version": 1,
+	"manifest_version": 2,
 	"id": "sqlexplorer",
 	"name": "SQL Explorer",
 	"author": "gr8b",
