@@ -14,7 +14,7 @@ const save_button = form.querySelector('#save_query')
 const config_button = document.getElementById('sqlexplorer.config')
 const stopwords = document.querySelector('[name="stopwords"]')
 
-config_button.addEventListener('click', () => PopUp('sqlexplorer.config'))
+config_button.addEventListener('click', () => PopUp('sqlexplorer.config', Object.fromEntries(new FormData(form))))
 document.getElementById('csv').addEventListener('click', function() {
     form.setAttribute('action', 'zabbix.php?action=sqlexplorer.csv')
     setLoadingState(true)
@@ -99,12 +99,14 @@ function setLoadingState(is_loading) {
 }
 
 function saveQueries() {
-    let sid = form.querySelector('[name="sid"]').value
+    let sid = form.querySelector('[name="sid"],[name="_csrf_token"')
+    let data = {queries: queries.filter(Boolean)}
+    data[sid.getAttribute('name')] = sid.value;
 
     setLoadingState(true)
-    return fetch(`?action=sqlexplorer.queries&sid=${sid}`, {
+    return fetch('?action=sqlexplorer.queries', {
             method: 'POST',
-            body: JSON.stringify({queries: queries.filter(Boolean)})
+            body: JSON.stringify(data)
         })
         .then(resp => resp.json())
         .finally(e => {

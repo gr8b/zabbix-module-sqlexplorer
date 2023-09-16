@@ -21,8 +21,14 @@ $form = (new CForm('post', $url))
     ->addVar('text_to_url', $data['text_to_url'])
     ->addVar('autoexec', $data['autoexec'])
     ->addVar('add_column_names', $data['add_column_names'])
-    ->addVar('stopwords', $data['stopwords'])
-    ->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
+    ->addVar('stopwords', $data['stopwords']);
+
+if (version_compare(ZABBIX_VERSION, '6.4.0', '<')) {
+    $form->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
+}
+else {
+    $form->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sqlexplorer')))->removeId());
+}
 
 $grid = new CFormGrid();
 
@@ -110,15 +116,19 @@ $form->addItem((new CTabView())
         [new CButton('csv', _('CSV'))]
     ))
 );
-
+$controls = [(new CButton('sqlexplorer.config', _('Configuration')))->addClass(ZBX_STYLE_BTN_ALT)];
 $widget
-    ->setControls([(new CButton('sqlexplorer.config', _('Configuration')))->addClass(ZBX_STYLE_BTN_ALT)])
+    ->setControls(
+        version_compare(ZABBIX_VERSION, '6.4.0', '>=')
+        ? (new CTag('nav', true, new CList($controls)))->setAttribute('aria-label', _('Content controls'))
+        : $controls
+    )
     ->addItem(new StyleTag(<<<'CSS'
-        .margin-between > * { vertical-align: middle; margin-right: 5px !important; }
-        /* Codemirror styles */
-        .cm-wrap.cm-focused { outline: 0 none; }
-        .cm-wrap { border: 1px solid silver; }
-        .cm-scroller { font-family: Consolas, Menlo, Monaco, source-code-pro, Courier New, monospace !important; font-size: 12px; }
+.margin-between > * { vertical-align: middle; margin-right: 5px !important; }
+/* Codemirror styles */
+.cm-wrap.cm-focused { outline: 0 none; }
+.cm-wrap { border: 1px solid silver; }
+.cm-scroller { font-family: Consolas, Menlo, Monaco, source-code-pro, Courier New, monospace !important; font-size: 12px; }
 CSS
     ))
     ->addItem(new JsonDataTag('page-json', [
