@@ -9,8 +9,8 @@ export to `.csv` is done without limiting rows count.
 
 ### Compatibility and Zabbix support
 
-For Zabbix 6.4 and newer, up to 7.0, use *-6.4 file for installation.
-For Zabbix version 6.2 and older use *-5.0 file to install.
+For Zabbix 6.4 and newer, up to 7.0, use `*-zabbix-6.4-7.0.zip` file for installation.
+For Zabbix version 6.2 and older use `*-zabbix-5.0-6.2.zip` file to install.
 
 ### Development
 
