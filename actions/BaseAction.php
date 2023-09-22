@@ -47,6 +47,6 @@ abstract class BaseAction extends Action {
             return parent::disableSIDvalidation();
         }
 
-        return $this->disableCsrfValidation();
+        return parent::disableCsrfValidation();
     }
 }

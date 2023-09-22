@@ -24,6 +24,14 @@
 			"class": "SqlConfig",
 			"layout": "layout.json",
 			"view": "sqlexplorer.config.form"
+		},
+		"sqlexplorer.config.export": {
+			"class": "SqlConfigExport",
+			"layout": "layout.export"
+		},
+		"sqlexplorer.config.import": {
+			"class": "SqlConfigImport",
+			"layout": "layout.json"
 		}
 	}
 }

@@ -14,7 +14,7 @@ $form = (new CForm())
     ->addVar('add_column_names', 0);
 
 if (version_compare(ZABBIX_VERSION, '6.4.0', '>=')) {
-    $form->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sqlexplorer')))->removeId());
+    $form->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sqlexplorer'), 'post-token')));
 }
 
 $form_list = (new CFormList())
@@ -41,49 +41,12 @@ $form_list = (new CFormList())
 
 $form
     ->addItem($form_list)
+    ->addItem(
+        (new CInput('file', 'import'))
+            ->setAttribute('accept', '.txt')
+            ->addClass(ZBX_STYLE_DISPLAY_NONE)
+    )
     ->addItem((new CInput('submit', 'submit', 1))->addStyle('display: none;'));
-
-$js_submit_handler = <<<'JS'
-function submitModuleConfig(overlay) {
-    const form = overlay.$dialogue[0].querySelector('form');
-    const url = new Curl(form.getAttribute('action'));
-    const data = new URLSearchParams(new FormData(form));
-    const error_container = overlay.$dialogue[0].querySelector('[data-error-container]');
-
-    error_container.innerHTML = '';
-    overlay.setLoading();
-    overlay.xhr = (function() {
-        const controller = new AbortController();
-        const req = fetch(url.getUrl(), {signal: controller.signal, method: 'POST', body: data})
-            .then(r => r.json())
-            .then(json => {
-                overlay.unsetLoading();
-
-                if (json.errors) {
-                    error_container.innerHTML = json.errors;
-                }
-                else {
-                    overlayDialogueDestroy(overlay.dialogueid);
-                    Object.entries(json.params).forEach(([key, value]) => {
-                        let input = document.querySelector(`[type="hidden"][name="${key}"]`);
-
-                        if (input !== null) {
-                            input.value = json.params[key];
-                        }
-                    });
-                }
-            })
-            .catch(error => {
-                overlay.unsetLoading();
-                error_container.innerHTML = error;
-            });
-
-        this.abort = () => controller.abort();
-
-        return this;
-    })();
-}
-JS;
 
 if ($data['params']) {
     $output = [
@@ -96,15 +59,24 @@ else {
         'body' => (new CDiv([(new CDiv($data['errors']))->setAttribute('data-error-container', 1), $form]))->toString(),
         'buttons' => [
             [
+                'title' => _('Import'),
+                'class' => 'js-import float-left '.ZBX_STYLE_BTN_ALT,
+                'keepOpen' => true
+            ],
+            [
+                'title' => _('Export'),
+                'class' => 'js-export float-left '.ZBX_STYLE_BTN_ALT,
+                'keepOpen' => true
+            ],
+            [
                 'title' => _('Apply'),
-                'class' => 'dialogue-widget-save',
+                'class' => 'js-submit dialogue-widget-save',
                 'keepOpen' => true,
-                'isSubmit' => true,
-                'action' => 'return submitModuleConfig(overlay);'
+                'isSubmit' => true
             ]
         ],
         'params' => $data['params'],
-        'script_inline' => $js_submit_handler
+        'script_inline' => $this->readJsFile('sqlexplorer.config.form.js')
     ];
 }
 
