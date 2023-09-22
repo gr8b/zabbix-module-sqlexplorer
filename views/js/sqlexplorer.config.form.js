@@ -21,7 +21,7 @@ modal.querySelector('.js-import').addEventListener('click', e => {
     overlay.unsetLoading();
 });
 const import_file = form.querySelector('[type="file"][name="import"]');
-import_file.addEventListener('change', e => {
+import_file.addEventListener('change', () => {
     const upload_form = new FormData();
 
     overlay.setLoading();
@@ -30,14 +30,8 @@ import_file.addEventListener('change', e => {
     fetch('?action=sqlexplorer.config.import', {method: "POST", body: upload_form})
         .then(xhr_json_response)
         .then(json => {
-            console.log('json', json);
-
-            if (json.errors) {
-                error_container.innerHTML = json.errors;
-            }
-            else {
-
-            }
+            error_container.innerHTML = json.messages;
+            import_file.value = '';
             overlay.unsetLoading();
         })
         .catch(xhr_catch_handler);
@@ -80,43 +74,3 @@ modal.querySelector('.js-submit').addEventListener('click', e => {
 });
 
 })(overlays_stack.end())
-
-function submitModuleConfig(overlay) {
-    const form = overlay.$dialogue[0].querySelector('form');
-    const url = new Curl(form.getAttribute('action'));
-    const data = new URLSearchParams(new FormData(form));
-    const error_container = overlay.$dialogue[0].querySelector('[data-error-container]');
-
-    error_container.innerHTML = '';
-    overlay.setLoading();
-    overlay.xhr = (function() {
-        const controller = new AbortController();
-        const req = fetch(url.getUrl(), {signal: controller.signal, method: 'POST', body: data})
-            .then(r => r.json())
-            .then(json => {
-                overlay.unsetLoading();
-
-                if (json.errors) {
-                    error_container.innerHTML = json.errors;
-                }
-                else {
-                    overlayDialogueDestroy(overlay.dialogueid);
-                    Object.entries(json.params).forEach(([key, value]) => {
-                        let input = document.querySelector(`[type="hidden"][name="${key}"]`);
-
-                        if (input !== null) {
-                            input.value = json.params[key];
-                        }
-                    });
-                }
-            })
-            .catch(error => {
-                overlay.unsetLoading();
-                error_container.innerHTML = error;
-            });
-
-        this.abort = () => controller.abort();
-
-        return this;
-    })();
-}

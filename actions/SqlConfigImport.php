@@ -15,9 +15,8 @@ class SqlConfigImport extends BaseAction {
 
             $this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
+                    'success' => false,
+                    'messages' => (string) getMessages(false)
 				])])
 			);
         }
@@ -26,13 +25,24 @@ class SqlConfigImport extends BaseAction {
     }
 
     public function doAction() {
-        // $output['error'] = [
-        //     'title' => _('Cannot import queries'),
-        //     'messages' => array_column(get_and_clear_messages(), 'message')
-        // ];
-        $queries = $this->importQueries(file($_FILES['queries']['tmp_name']));
-        $output = [
-            'queries' => $queries
+        $output = [];
+        $file = $_FILES['queries'];
+        $queries = $this->importQueries(file($file['tmp_name']));
+
+        if (count($queries) == 0) {
+            error(_s('No queries were found in file %1$s', $file['name']));
+            $output['success'] = false;
+        }
+        else {
+            // Import queries to database
+            info(_s('File %1$s imported successfully, %2$s queries created.', $file['name'], count($queries)));
+
+            $output['success'] = true;
+        }
+
+        $output += [
+            // 'queries' => $queries,
+            'messages' => (string) getMessages($output['success'])
         ];
 
         $this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
