@@ -14,7 +14,6 @@ class SqlConfigExport extends BaseAction {
 
     public function doAction() {
         $data = [
-            'mime_type' => 'text/plain',
             'page' => ['file' => 'queries.txt'],
             'main_block' => implode("\n", Export::toText(Profile::getQueries()))
         ];

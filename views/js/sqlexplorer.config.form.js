@@ -8,10 +8,23 @@ const xhr_catch_handler = error => {
     overlay.unsetLoading();
     error_container.innerHTML = error;
 }
+const getUrlFor = action => {
+    const url = new Curl('zabbix.php');
+    url.setArgument('action', action);
+    return url.getUrl();
+}
+const addPostMessages = (type, messages) => {
+    if (window.postMessageDetails) {
+        return postMessageDetails(type, messages);
+    }
+
+    // Compatibility for 5.0
+    return window[type === 'success' ? 'postMessageOk' : 'postMessageError'](messages.join("\n"));
+}
 
 // Export.
 modal.querySelector('.js-export').addEventListener('click', e => {
-    window.location.href = '?action=sqlexplorer.config.export';
+    window.location.href = getUrlFor('sqlexplorer.config.export');
     window.addEventListener('focus', _ => overlay.unsetLoading(), {once: true});
 });
 
@@ -26,12 +39,12 @@ import_file.addEventListener('change', () => {
 
     overlay.setLoading();
     upload_form.append('queries', import_file.files[0]);
-    upload_form.append(token.name, token.value);
-    fetch('?action=sqlexplorer.config.import', {method: "POST", body: upload_form})
+    token !== null && upload_form.append(token.name, token.value);
+    fetch(getUrlFor('sqlexplorer.config.import'), {method: "POST", body: upload_form})
         .then(xhr_json_response)
         .then(json => {
             if (json.success) {
-                postMessageDetails('success', json.post_messages);
+                addPostMessages('success', json.post_messages);
                 window.location.href = window.location.href;
 
                 return;
@@ -46,14 +59,13 @@ import_file.addEventListener('change', () => {
 
 // Submit configuration form.
 modal.querySelector('.js-submit').addEventListener('click', e => {
-    const url = new Curl(form.getAttribute('action'));
     const data = new URLSearchParams(new FormData(form));
 
     error_container.innerHTML = '';
     overlay.setLoading();
     overlay.xhr = (function() {
         const controller = new AbortController();
-        const req = fetch(url.getUrl(), {signal: controller.signal, method: 'POST', body: data})
+        const req = fetch(getUrlFor(form.getAttribute('action')), {signal: controller.signal, method: 'POST', body: data})
             .then(xhr_json_response)
             .then(json => {
                 overlay.unsetLoading();

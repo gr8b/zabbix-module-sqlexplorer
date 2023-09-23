@@ -27,7 +27,7 @@
 		},
 		"sqlexplorer.config.export": {
 			"class": "SqlConfigExport",
-			"layout": "layout.export"
+			"layout": "layout.text"
 		},
 		"sqlexplorer.config.import": {
 			"class": "SqlConfigImport",
