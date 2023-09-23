@@ -30,6 +30,13 @@ import_file.addEventListener('change', () => {
     fetch('?action=sqlexplorer.config.import', {method: "POST", body: upload_form})
         .then(xhr_json_response)
         .then(json => {
+            if (json.success) {
+                postMessageDetails('success', json.post_messages);
+                window.location.href = window.location.href;
+
+                return;
+            }
+
             error_container.innerHTML = json.messages;
             import_file.value = '';
             overlay.unsetLoading();

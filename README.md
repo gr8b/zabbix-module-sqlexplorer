@@ -7,6 +7,37 @@ Codemirror is used as query editor. It supports SQL syntax highlight and databas
 Use *"Administration -> General -> GUI -> Limit for search and filter results"* to configure max rows count to be displayed,
 export to `.csv` is done without limiting rows count.
 
+### Export file format
+
+All stored SQL queries can be exported as single `.txt` file. Format of one SQL query:
+- A line with two dash characters at the beginning, followed by the query name as it is set in the dropdown. The query can contain multiple SQL-style comment lines, but only the first one is used as the query name in the dropdown.
+- The SQL code itself, which can span multiple lines.
+- A line with two dash characters, marking the end of the query definition.
+- An empty line, while not required, is suggested to improve the readability of the export file.
+
+_Note: Successfull import will replace all stored queries._
+
+Example file `Z60.txt`:
+```sql
+-- All events closed by global correlation rule
+SELECT repercussion.clock, repercussion.name, rootCause.clock, rootCause.name AS name
+    FROM events repercussion
+    JOIN event_recovery ON (event_recovery.eventid=repercussion.eventid)
+    JOIN events rootCause ON (rootCause.eventid=event_recovery.c_eventid)
+    WHERE event_recovery.c_eventid IS NOT NULL
+    ORDER BY repercussion.clock ASC;
+--
+
+-- SNMP hosts unreachable
+SELECT proxy.host AS proxy, hosts.host, interface.error, CONCAT('zabbix.php?action=host.edit&hostid=', hosts.hostid) AS goTo
+    FROM hosts
+    LEFT JOIN hosts proxy ON (hosts.proxy_hostid=proxy.hostid)
+    JOIN interface ON (interface.hostid=hosts.hostid)
+    WHERE LENGTH(interface.error) > 0
+        AND interface.type=2;
+--
+```
+
 ### Compatibility and Zabbix support
 
 For Zabbix 6.4 and newer, up to 7.0, use `*-zabbix-6.4-7.0.zip` file for installation.

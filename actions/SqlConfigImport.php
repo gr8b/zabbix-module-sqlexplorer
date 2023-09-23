@@ -4,6 +4,7 @@ namespace Modules\SqlExplorer\Actions;
 
 use CControllerResponseData;
 use Modules\SqlExplorer\Helpers\ProfileHelper as Profile;
+use Modules\SqlExplorer\Helpers\ImportHelper as Import;
 
 class SqlConfigImport extends BaseAction {
 
@@ -25,67 +26,30 @@ class SqlConfigImport extends BaseAction {
     }
 
     public function doAction() {
-        $output = [];
         $file = $_FILES['queries'];
-        $queries = $this->importQueries(file($file['tmp_name']));
+        $queries = Import::fromLinesArray(file($file['tmp_name']));
+        $output = ['queries' => $queries];
 
         if (count($queries) == 0) {
             error(_s('No queries were found in file %1$s', $file['name']));
-            $output['success'] = false;
+
+            $output += [
+                'success' => false,
+                'messages' => (string) getMessages(false)
+            ];
         }
         else {
-            // Import queries to database
-            info(_s('File %1$s imported successfully, %2$s queries created.', $file['name'], count($queries)));
-
-            $output['success'] = true;
+            Profile::updateQueries($queries);
+            $output += [
+                'success' => true,
+                'messages' => '',
+                'post_messages' => [
+                    _s('File "%1$s" imported successfully.', $file['name']),
+                    _n('%1$s query created.', '%1$s queries created.', count($queries))
+                ]
+            ];
         }
-
-        $output += [
-            // 'queries' => $queries,
-            'messages' => (string) getMessages($output['success'])
-        ];
 
         $this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
-    }
-
-    protected function importQueries(array $lines): array {
-        $queries = [];
-        $query = [];
-        $prev_line = '';
-
-        foreach ($lines as $line) {
-            if (trim($line) === '' && trim($prev_line) === '') {
-                if ($query) {
-                    $queries[] = $query;
-                    $query = [];
-                }
-
-                continue;
-            }
-
-            if (!array_key_exists('title', $query)) {
-                $query = [
-                    'title' => $line,
-                    'query' => []
-                ];
-            }
-            else {
-                $query['query'][] = $line;
-            }
-
-            $prev_line = $line;
-        }
-
-        if ($query) {
-            $queries[] = $query;
-            $query = [];
-        }
-
-        foreach ($queries as &$query) {
-            $query['query'] = trim(implode("\n", $query['query']));
-        }
-        unset($query);
-        
-        return $queries;
     }
 }
