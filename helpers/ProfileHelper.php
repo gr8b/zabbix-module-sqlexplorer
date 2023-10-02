@@ -3,7 +3,6 @@
 namespace Modules\SqlExplorer\Helpers;
 
 use DB;
-use CArrayHelper;
 use CProfile;
 use CWebUser;
 

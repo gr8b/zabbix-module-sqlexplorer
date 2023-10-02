@@ -38,7 +38,7 @@ zip-release:
 	rm -rf $(VERSION_TAG)-6.4.zip
 	$(MAKE) buildjs
 	sed -i "s/\"manifest_version\": 2/\"manifest_version\": 1/g" manifest.json
-	zip $(VERSION_TAG)-zabbix-5.0-6.2.zip actions/* public/* views/* helpers/* helpers/html/* Module.php manifest.json
+	zip $(VERSION_TAG)-zabbix-5.0-6.2.zip actions/* public/* views/* views/js/* helpers/* helpers/html/* Module.php manifest.json
 	sed -i "s/\"manifest_version\": 1/\"manifest_version\": 2/g" manifest.json
-	zip $(VERSION_TAG)-zabbix-6.4-7.0.zip actions/* public/* views/* helpers/* helpers/html/* Module.php manifest.json
+	zip $(VERSION_TAG)-zabbix-6.4-7.0.zip actions/* public/* views/* views/js/* helpers/* helpers/html/* Module.php manifest.json
 
