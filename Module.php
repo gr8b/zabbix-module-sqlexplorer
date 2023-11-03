@@ -3,8 +3,8 @@
 namespace Modules\SqlExplorer;
 
 if (version_compare(ZABBIX_VERSION, '6.4.0', '>')) {
-    class_alias('\Zabbix\Core\CModule', '\Core\CModule');
-    class_alias('\CHtmlPage', '\CWidget');
+    class_exists('\Core\CModule', false) or class_alias('\Zabbix\Core\CModule', '\Core\CModule');
+    class_exists('\CWidget', false) or class_alias('\CHtmlPage', '\CWidget');
 }
 
 use APP;

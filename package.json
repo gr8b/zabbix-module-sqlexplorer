@@ -6,7 +6,6 @@
     "scripts": {
         "clean": "rm -rf ./public/ .cache",
         "docker-init": "docker build -t noderollup:latest ./",
-        "prepare": "npm install",
         "build": "rollup app.js -f iife -o ./public/app.min.js -p @rollup/plugin-node-resolve"
     },
     "author": "gr8b",

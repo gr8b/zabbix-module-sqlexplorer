@@ -3,7 +3,7 @@ VERSION_TAG=$(shell git describe --tags --abbrev=0)
 
 
 prepare:
-	docker run --rm -it -v $(shell pwd):/app -w /app $(DOCKER_IMAGE) npm install --no-optional
+	docker run --rm -it -v $(shell pwd):/app -w /app $(DOCKER_IMAGE) npm install --omit=optional
 
 dev-watch:
 	docker run --rm -it --user `id -u`:`id -g` -v $(shell pwd):/app -w /app \
