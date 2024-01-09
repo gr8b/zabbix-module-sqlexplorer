@@ -13,12 +13,12 @@ use Modules\SqlExplorer\Helpers\ProfileHelper as Profile;
 class SqlForm extends BaseAction {
 
     protected function checkInput() {
-        $fields = $this->getValidationRules();
+        $fields = $this->getSqlFormValidationRules();
 
         return $this->validateInput($fields);
     }
 
-    protected function getValidationRules() {
+    protected function getSqlFormValidationRules() {
         if ($this->getAction() === 'sqlexplorer.csv') {
             return [
                 'fav' => 'int32',
