@@ -7,6 +7,8 @@ Codemirror is used as query editor. It supports SQL syntax highlight and databas
 Use *"Administration -> General -> GUI -> Limit for search and filter results"* to configure max rows count to be displayed,
 export to `.csv` is done without limiting rows count.
 
+[![Latest Release](https://img.shields.io/github/v/release/gr8b/zabbix-module-sqlexplorer)](https://github.com/gr8b/zabbix-module-sqlexplorer/releases)
+
 ### Export file format
 
 All stored SQL queries can be exported as single `.txt` file. Format of one SQL query:
