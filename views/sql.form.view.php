@@ -27,7 +27,7 @@ if (version_compare(ZABBIX_VERSION, '6.4.0', '<')) {
     $form->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 }
 else {
-    $form->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sqlexplorer')))->removeId());
+    $form->addVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $data['csrf_token']['sqlexplorer.form']);
 }
 
 $grid = new CFormGrid();
@@ -134,7 +134,11 @@ CSS
     ->addItem(new JsonDataTag('page-json', [
         'dark_theme' => in_array(getUserTheme(CWebUser::$data), ['dark-theme']),
         'queries' => $data['queries'],
-        'db_schema' => $data['db_schema']
+        'db_schema' => $data['db_schema'],
+        'token' => [
+            'name' => CCsrfTokenHelper::CSRF_TOKEN_NAME,
+            'action' => $data['csrf_token']
+        ]
     ]))
     ->addItem($form)
     ->addItem($table)

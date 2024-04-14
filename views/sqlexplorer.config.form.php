@@ -14,7 +14,8 @@ $form = (new CForm())
     ->addVar('add_column_names', 0);
 
 if (version_compare(ZABBIX_VERSION, '6.4.0', '>=')) {
-    $form->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sqlexplorer'), 'post-token')));
+    $form->addVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $data['csrf_token']['sqlexplorer.config.import'], 'import-token');
+    $form->addVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $data['csrf_token']['sqlexplorer.config'], 'post-token');
 }
 
 $form_list = (new CFormList())

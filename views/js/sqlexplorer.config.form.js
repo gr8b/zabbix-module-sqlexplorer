@@ -1,7 +1,7 @@
 (overlay => {
 const modal = overlay.$dialogue[0];
 const form = modal.querySelector('form');
-const token = form.querySelector('#post-token');
+const token = form.querySelector('#import-token');
 const error_container = modal.querySelector('[data-error-container]');
 const xhr_json_response = response => response.json();
 const xhr_catch_handler = error => {

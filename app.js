@@ -14,14 +14,22 @@ const save_button = form.querySelector('#save_query')
 const config_button = document.getElementById('sqlexplorer.config')
 const stopwords = document.querySelector('[name="stopwords"]')
 
-config_button.addEventListener('click', () => PopUp('sqlexplorer.config', Object.fromEntries(new FormData(form))))
+function setActionToken(action, form) {
+    form.querySelector(`[name="${page_data.token.name}"]`)?.setAttribute('value', page_data.token.action[action])
+}
+config_button.addEventListener('click', () => {
+    setActionToken('sqlexplorer.config', form)
+    PopUp('sqlexplorer.config', Object.fromEntries(new FormData(form)))
+})
 document.getElementById('csv').addEventListener('click', function() {
+    setActionToken('sqlexplorer.csv', form)
     form.setAttribute('action', 'zabbix.php?action=sqlexplorer.csv')
     setLoadingState(true)
     form.submit()
     setTimeout(() => setLoadingState(false), 1000)
 });
 document.getElementById('preview').addEventListener('click', function(e) {
+    setActionToken('sqlexplorer.form', form)
     form.setAttribute('action', 'zabbix.php?action=sqlexplorer.form')
 
     if (checkStopWords(editor.state.doc.toString()) == false) {
@@ -99,9 +107,15 @@ function setLoadingState(is_loading) {
 }
 
 function saveQueries() {
-    let sid = form.querySelector('[name="sid"],[name="_csrf_token"')
+    let sid = form.querySelector('[name="sid"]')
     let data = {queries: queries.filter(Boolean)}
-    data[sid.getAttribute('name')] = sid.value;
+
+    if (sid) {
+        data.sid = sid.value
+    }
+    else {
+        data[page_data.token.name] = page_data.token.action['sqlexplorer.queries']
+    }
 
     setLoadingState(true)
     return fetch('?action=sqlexplorer.queries', {
@@ -151,7 +165,7 @@ query_textbox.addEventListener('change', e => {
 
     editor.dispatch({
         changes: {
-            from: 0, 
+            from: 0,
             to: old_value.length,
             insert: query_textbox.value
         }

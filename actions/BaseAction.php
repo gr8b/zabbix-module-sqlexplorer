@@ -3,6 +3,7 @@
 namespace Modules\SqlExplorer\Actions;
 
 use CWebUser;
+use CCsrfTokenHelper;
 use CController as Action;
 
 abstract class BaseAction extends Action {
@@ -48,5 +49,17 @@ abstract class BaseAction extends Action {
         }
 
         return parent::disableCsrfValidation();
+    }
+
+    protected function getActionCsrfToken(string $action): string {
+        if (version_compare(ZABBIX_VERSION, '6.4.13', '<')) {
+            $action = 'sqlexplorer';
+        }
+
+        if (version_compare(ZABBIX_VERSION, '7.0.0alpha1', '>') && version_compare(ZABBIX_VERSION, '7.0.0beta2', '<')) {
+            $action = 'sqlexplorer';
+        }
+
+        return CCsrfTokenHelper::get($action);
     }
 }

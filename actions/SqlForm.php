@@ -109,6 +109,12 @@ class SqlForm extends BaseAction {
             }
         }
 
+        $data['csrf_token'] = [
+            'sqlexplorer.form' => $this->getActionCsrfToken('sqlexplorer.form'),
+            'sqlexplorer.csv' => $this->getActionCsrfToken('sqlexplorer.csv'),
+            'sqlexplorer.config' => $this->getActionCsrfToken('sqlexplorer.config'),
+            'sqlexplorer.queries' => $this->getActionCsrfToken('sqlexplorer.queries')
+        ];
         $data['public_path'] = $this->module->getAssetsUrl();
         $data['database'] = $this->module->getDatabase();
         $queries = Profile::getQueries();

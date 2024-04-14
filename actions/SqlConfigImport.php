@@ -15,11 +15,11 @@ class SqlConfigImport extends BaseAction {
             error('File required.');
 
             $this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
+                new CControllerResponseData(['main_block' => json_encode([
                     'success' => false,
                     'messages' => (string) getMessages(false)
-				])])
-			);
+                ])])
+            );
         }
 
         return $ret;

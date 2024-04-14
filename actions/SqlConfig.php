@@ -39,6 +39,10 @@ class SqlConfig extends BaseAction {
         $data = [
             'title' => _('Configuration'),
             'action' => $this->getAction(),
+            'csrf_token' => [
+                'sqlexplorer.config' => $this->getActionCsrfToken('sqlexplorer.config'),
+                'sqlexplorer.config.import' => $this->getActionCsrfToken('sqlexplorer.config.import')
+            ],
             'refresh' => 0,
             'errors' => '',
             'params' => [],
