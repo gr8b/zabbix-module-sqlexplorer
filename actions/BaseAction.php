@@ -52,6 +52,10 @@ abstract class BaseAction extends Action {
     }
 
     protected function getActionCsrfToken(string $action): string {
+        if (version_compare(ZABBIX_VERSION, '6.4.0', '<')) {
+            return '';
+        }
+
         if (version_compare(ZABBIX_VERSION, '6.4.13', '<')) {
             $action = 'sqlexplorer';
         }

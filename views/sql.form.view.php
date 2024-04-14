@@ -14,6 +14,7 @@ $db_label = [
     ZBX_DB_POSTGRESQL => _('Postgre'),
     ZBX_DB_ORACLE => _('Oracle')
 ][$data['database']['type']];
+$token_name = '';
 $page_title = sprintf('%s - %s:%s', _('SQL Explorer'), $db_label, $data['database']['table']);
 $widget = (new CWidget())->setTitle($page_title);
 $form = (new CForm('post', $url))
@@ -27,7 +28,8 @@ if (version_compare(ZABBIX_VERSION, '6.4.0', '<')) {
     $form->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 }
 else {
-    $form->addVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $data['csrf_token']['sqlexplorer.form']);
+    $token_name = CCsrfTokenHelper::CSRF_TOKEN_NAME;
+    $form->addVar($token_name, $data['csrf_token']['sqlexplorer.form']);
 }
 
 $grid = new CFormGrid();
@@ -136,7 +138,7 @@ CSS
         'queries' => $data['queries'],
         'db_schema' => $data['db_schema'],
         'token' => [
-            'name' => CCsrfTokenHelper::CSRF_TOKEN_NAME,
+            'name' => $token_name,
             'action' => $data['csrf_token']
         ]
     ]))
