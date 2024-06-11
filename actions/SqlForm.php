@@ -95,8 +95,7 @@ class SqlForm extends BaseAction {
 
     protected function getHtmlResponse(array $data) {
         if ($this->hasInput('preview')) {
-            $cursor = DBselect($data['query']);
-            $data['rows'] = $cursor === false ? [] : DBfetchArray($cursor);
+            $data['rows'] = $this->module->dbSelect($data['query']);
             $data['rows_limit'] = $this->getGuiSearchLimit();
             $data['rows_count'] = count($data['rows']);
 

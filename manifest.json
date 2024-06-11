@@ -33,5 +33,6 @@
 			"class": "SqlConfigImport",
 			"layout": "layout.json"
 		}
-	}
+	},
+	"connection": ""
 }

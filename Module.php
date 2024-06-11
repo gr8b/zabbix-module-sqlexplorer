@@ -56,6 +56,40 @@ class Module extends CModule {
         ];
     }
 
+    public function dbSelect(string $query) {
+        global $DB;
+
+        $db = null;
+        $error = null;
+        $rows = [];
+        $config = $this->getManifest();
+
+        if (array_key_exists('connection', $config) && strpos($config['connection'], ':')) {
+            unset($DB['DB']);
+            $db = $DB;
+            list($DB['USER'], $DB['PASSWORD']) = explode(':', $config['connection']);
+            DBconnect($error);
+        }
+
+        if ($error === null) {
+            $resource = DBselect($query);
+            $rows = $resource === false ? [] : DBfetchArray($resource);
+        }
+
+        if ($db === null) {
+            return $rows;
+        }
+
+        if ($error !== null) {
+            error($error);
+        }
+
+        $DB = $db;
+        DBconnect($error);
+
+        return $rows;
+    }
+
     public function getAssetsUrl() {
         return version_compare(ZABBIX_VERSION, '6.4', '>=')
             ? $this->getRelativePath().'/public/'

@@ -40,6 +40,18 @@ SELECT proxy.host AS proxy, hosts.host, interface.error, CONCAT('zabbix.php?acti
 --
 ```
 
+### Safe mode
+
+To activate safe mode, the `manifest.json` file must include a `connection` property that contains credentials string in the format `username:password`.
+When mode is enabled, module database interactions will use credentials for all database queries.
+
+Example:
+```
+{
+    "connection": "zabbix:zabbix"
+}
+```
+
 ### Compatibility and Zabbix support
 
 For Zabbix 6.4 and newer, up to 7.0, use `*-zabbix-6.4-7.0.zip` file for installation.
