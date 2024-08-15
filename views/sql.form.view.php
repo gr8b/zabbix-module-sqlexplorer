@@ -131,6 +131,7 @@ $widget
 .cm-wrap.cm-focused { outline: 0 none; }
 .cm-wrap { border: 1px solid silver; }
 .cm-scroller { font-family: Consolas, Menlo, Monaco, source-code-pro, Courier New, monospace !important; font-size: 12px; }
+[name="fav"] .list li { max-width: 100%; }
 CSS
     ))
     ->addItem(new JsonDataTag('page-json', [
