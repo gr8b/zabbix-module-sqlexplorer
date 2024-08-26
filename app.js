@@ -25,6 +25,7 @@ document.getElementById('csv').addEventListener('click', function() {
     setActionToken('sqlexplorer.csv', form)
     form.setAttribute('action', 'zabbix.php?action=sqlexplorer.csv')
     setLoadingState(true)
+    query_textbox.value = window.btoa(unescape(encodeURIComponent(editor.state.doc.toString())))
     form.submit()
     setTimeout(() => setLoadingState(false), 1000)
 });
@@ -39,6 +40,7 @@ document.getElementById('preview').addEventListener('click', function(e) {
         return false
     }
 
+    query_textbox.value = window.btoa(unescape(encodeURIComponent(editor.state.doc.toString())))
     setLoadingState(true)
     form.submit()
 });
@@ -152,9 +154,6 @@ let editor = new EditorView({
         doc: query_textbox.value
     }),
     parent: query_textbox.parentElement
-})
-form.addEventListener('submit', e => {
-    query_textbox.value = editor.state.doc.toString()
 })
 query_textbox.addEventListener('change', e => {
     let old_value = editor.state.doc.toString()

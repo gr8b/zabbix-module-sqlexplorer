@@ -56,11 +56,10 @@ class Module extends CModule {
         ];
     }
 
-    public function dbSelect(string $query) {
+    public function dbSelect(string $query, &$error = null) {
         global $DB;
 
         $db = null;
-        $error = null;
         $rows = [];
         $config = $this->getManifest();
 
