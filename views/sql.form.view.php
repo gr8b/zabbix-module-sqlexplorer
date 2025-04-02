@@ -9,6 +9,9 @@ use Modules\SqlExplorer\Helpers\Html\ScriptTag;
 $url = (new Curl())
     ->setArgument('action', 'sqlexplorer.form')
     ->getUrl();
+
+define('ZBX_DB_ORACLE', 3); // Dummy value. Oracle DB support was dropped. With this change it works on Zabbix 7.2.3
+
 $db_label = [
     ZBX_DB_MYSQL => _('MySQL'),
     ZBX_DB_POSTGRESQL => _('Postgre'),
