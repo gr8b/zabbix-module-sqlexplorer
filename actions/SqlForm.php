@@ -55,7 +55,7 @@ class SqlForm extends BaseAction {
                 : $this->getHtmlResponse($data)
         );
     }
-
+    
     protected function getCsvResponse(array $data) {
         $cursor = DBselect($data['query']);
 
@@ -65,34 +65,51 @@ class SqlForm extends BaseAction {
                     ->setArgument('action', 'sqlexplorer.form')
                     ->getUrl()
             );
-            $response->setFormData($this->getInputAll());
-
-            if (version_compare(ZABBIX_VERSION, '6.0', '<')) {
-                [$message] = clear_messages();
-                $response->setMessageError($message['message']);
-            }
-            else {
-                CMessageHelper::setErrorTitle(_('Query error'));
-            }
-
             return $response;
         }
 
-        $rows = DBfetchArray($cursor);
+        // streams CSV output
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="query_export.csv"');
 
-        if ($rows && $data['add_column_names']) {
-            array_unshift($rows, array_keys($rows[0]));
+        // UTF-8 BOM for Excel
+        echo "\xEF\xBB\xBF";
+        // output buffering
+        ob_start();
+        $output = fopen('php://output', 'w');
+
+        try {
+            $first_row = true;
+            $columns = [];
+            while ($row = DBfetch($cursor)) {
+                if ($first_row) {
+                    // Extract column names from first row
+                    $columns = array_keys($row);
+                    // Add header row if enabled
+                    if ($data['add_column_names']) {
+                        fputcsv($output, $columns, ',', '"');
+                    }
+                    $first_row = false;
+                }
+                // Properly escape all values
+                $escaped_row = [];
+                foreach ($row as $value) {
+                    $escaped_row[] = is_string($value)
+                        ? str_replace(["\r", "\n"], ['', ' '], $value)  // clean new lines
+                        : $value;
+                }
+                fputcsv($output, $escaped_row, ',', '"');
+            }
+            fclose($output);
+            ob_end_flush();
+        } catch (Exception $e) {
+            ob_end_clean();
+            throw $e;
         }
 
-        $data = [
-            'main_block' => zbx_toCSV($rows)
-        ];
-        $response = new CControllerResponseData($data);
-        $response->setFileName('query_export.csv');
-
-        return $response;
+        exit;
     }
-
+    
     protected function getHtmlResponse(array $data) {
         if ($this->hasInput('preview')) {
             $data['rows'] = $this->module->dbSelect($data['query']);
