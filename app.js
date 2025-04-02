@@ -1,5 +1,6 @@
 import {EditorState, EditorView, basicSetup} from "@codemirror/basic-setup"
 import {sql, MySQL, PostgreSQL} from "@codemirror/lang-sql"
+import { oneDark } from "@codemirror/theme-one-dark"
 
 const page_data = JSON.parse(document.querySelector('#page-json').innerText)
 let queries = page_data.queries
@@ -140,15 +141,18 @@ function checkStopWords(query) {
 
 // https://www.raresportan.com/how-to-make-a-code-editor-with-codemirror6/
 // configuration https://github.com/codemirror/lang-sql
-// TODO:fix styles for dark theme
-const theme = EditorView.baseTheme({},{dark: page_data.dark_theme})
+const theme = EditorView.baseTheme({},{dark: false})
 let editor = new EditorView({
     state: EditorState.create({
-        extensions: [basicSetup, sql({
-            dialect: MySQL,
-            schema: page_data.db_schema,
-            upperCaseKeywords: true
-        }), theme],
+        extensions: [
+            page_data.dark_theme ? oneDark : theme,
+            basicSetup,
+            sql({
+                dialect: MySQL,
+                schema: page_data.db_schema,
+                upperCaseKeywords: true
+            })
+        ],
         doc: query_textbox.value
     }),
     parent: query_textbox.parentElement
