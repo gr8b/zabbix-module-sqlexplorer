@@ -42,10 +42,11 @@ class SqlForm extends BaseAction {
             'tab_url' => Profile::getPersonal(Profile::KEY_TAB_URL, 0),
             'text_to_url' => Profile::getPersonal(Profile::KEY_TEXT_TO_URL, 1),
             'autoexec' => Profile::getPersonal(Profile::KEY_AUTOEXEC_SQL, 0),
-            'add_bom_csv' => Profile::getPersonal(Profile::KEY_BOM_CSV, 0),
             'name' => '',
             'query'	 => "\n\n\n",
             'add_column_names' => Profile::getPersonal(Profile::KEY_SHOW_HEADER, 0),
+            'add_bom_csv' => Profile::getPersonal(Profile::KEY_BOM_CSV, 0),
+            'force_single_line_csv' => Profile::getPersonal(Profile::KEY_SINGLE_LINE_CSV, 0),
             'stopwords' => Profile::getPersonal(Profile::KEY_STOP_WORDS, Profile::DEFAULT_STOP_WORDS)
         ];
         $this->getInputs($data, array_keys($data));
@@ -59,58 +60,48 @@ class SqlForm extends BaseAction {
 
     protected function getCsvResponse(array $data) {
         $cursor = DBselect($data['query']);
-
         if ($cursor === false) {
             $response = new CControllerResponseRedirect(
                 (new CUrl('zabbix.php'))
                     ->setArgument('action', 'sqlexplorer.form')
                     ->getUrl()
             );
+            $response->setFormData($this->getInputAll());
+
+            if (version_compare(ZABBIX_VERSION, '6.0', '<')) {
+                [$message] = clear_messages();
+                $response->setMessageError($message['message']);
+            }
+            else {
+                CMessageHelper::setErrorTitle(_('Query error'));
+            }
+
             return $response;
         }
 
-        $bom = $data['add_bom_csv'] ? "\0xef\0xbb\0xbf" : "";
+        $rows = DBfetchArray($cursor);
 
-        // streams CSV output
-        header('Content-Type: text/csv; charset=UTF-8');
-        header('Content-Disposition: attachment; filename="query_export.csv"');
-
-        // UTF-8 BOM for Excel
-        echo $bom;
-        // output buffering
-        ob_start();
-        $output = fopen('php://output', 'w');
-
-        try {
-            $first_row = true;
-            $columns = [];
-            while ($row = DBfetch($cursor)) {
-                if ($first_row) {
-                    // Extract column names from first row
-                    $columns = array_keys($row);
-                    // Add header row if enabled
-                    if ($data['add_column_names']) {
-                        fputcsv($output, $columns, ',', '"');
-                    }
-                    $first_row = false;
-                }
-                // Properly escape all values
-                $escaped_row = [];
-                foreach ($row as $value) {
-                    $escaped_row[] = is_string($value)
-                        ? str_replace(["\r", "\n"], ['', ' '], $value)  // clean new lines
-                        : $value;
-                }
-                fputcsv($output, $escaped_row, ',', '"');
-            }
-            fclose($output);
-            ob_end_flush();
-        } catch (Exception $e) {
-            ob_end_clean();
-            throw $e;
+        if ($rows && $data['add_column_names']) {
+            array_unshift($rows, array_keys($rows[0]));
         }
 
-        exit;
+        if ($data['force_single_line_csv']) {
+            foreach ($rows as &$row) {
+                foreach ($row as &$col) {
+                    $col = str_replace(["\r", "\n"], ['', ' '], $col);
+                }
+                unset($col);
+            }
+            unset($row);
+        }
+
+        $data = [
+            'main_block' => ($data['add_bom_csv'] ? "\xef\xbb\xbf" : '').zbx_toCSV($rows)
+        ];
+        $response = new CControllerResponseData($data);
+        $response->setFileName('query_export.csv');
+
+        return $response;
     }
 
     protected function getHtmlResponse(array $data) {

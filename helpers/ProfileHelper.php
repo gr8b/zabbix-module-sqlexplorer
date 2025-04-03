@@ -17,6 +17,7 @@ class ProfileHelper {
     const KEY_SHOW_HEADER = 'header';
     const KEY_STOP_WORDS = 'stopwords';
     const KEY_BOM_CSV = 'bom_csv';
+    const KEY_SINGLE_LINE_CSV = 'force_single_line_csv';
 
     const DEFAULT_STOP_WORDS = 'insert delete truncate create drop';
     /**
