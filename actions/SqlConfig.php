@@ -14,6 +14,7 @@ class SqlConfig extends BaseAction {
             'tab_url' => 'in 0,1',
             'autoexec' => 'in 0,1',
             'add_column_names' => 'in 0,1',
+            'add_bom_csv' => 'in 0,1',
             'stopwords' => 'string'
         ];
 
@@ -53,15 +54,19 @@ class SqlConfig extends BaseAction {
             'text_to_url' => Profile::getPersonal(Profile::KEY_TEXT_TO_URL, 1),
             'autoexec' => Profile::getPersonal(Profile::KEY_AUTOEXEC_SQL, 1),
             'add_column_names' => Profile::getPersonal(Profile::KEY_SHOW_HEADER, 1),
+            'add_bom_csv' => Profile::getPersonal(Profile::KEY_BOM_CSV, 0),
             'stopwords' => Profile::getPersonal(Profile::KEY_STOP_WORDS, Profile::DEFAULT_STOP_WORDS)
         ];
-        $this->getInputs($data, ['refresh', 'tab_url', 'text_to_url', 'autoexec', 'add_column_names', 'stopwords']);
+        $this->getInputs($data, ['refresh', 'tab_url', 'text_to_url', 'autoexec', 'add_column_names', 'add_bom_csv',
+            'stopwords'
+        ]);
 
         if ($this->hasInput('refresh')) {
             Profile::updatePersonal(Profile::KEY_TAB_URL, $data['tab_url']);
             Profile::updatePersonal(Profile::KEY_TEXT_TO_URL, $data['text_to_url']);
             Profile::updatePersonal(Profile::KEY_AUTOEXEC_SQL, $data['autoexec']);
             Profile::updatePersonal(Profile::KEY_SHOW_HEADER, $data['add_column_names']);
+            Profile::updatePersonal(Profile::KEY_BOM_CSV, $data['add_bom_csv']);
             Profile::updatePersonal(Profile::KEY_STOP_WORDS, $data['stopwords']);
 
             $data['params'] = [

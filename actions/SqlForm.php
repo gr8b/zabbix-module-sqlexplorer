@@ -42,6 +42,7 @@ class SqlForm extends BaseAction {
             'tab_url' => Profile::getPersonal(Profile::KEY_TAB_URL, 0),
             'text_to_url' => Profile::getPersonal(Profile::KEY_TEXT_TO_URL, 1),
             'autoexec' => Profile::getPersonal(Profile::KEY_AUTOEXEC_SQL, 0),
+            'add_bom_csv' => Profile::getPersonal(Profile::KEY_BOM_CSV, 0),
             'name' => '',
             'query'	 => "\n\n\n",
             'add_column_names' => Profile::getPersonal(Profile::KEY_SHOW_HEADER, 0),
@@ -55,7 +56,7 @@ class SqlForm extends BaseAction {
                 : $this->getHtmlResponse($data)
         );
     }
-    
+
     protected function getCsvResponse(array $data) {
         $cursor = DBselect($data['query']);
 
@@ -68,12 +69,14 @@ class SqlForm extends BaseAction {
             return $response;
         }
 
+        $bom = $data['add_bom_csv'] ? "\0xef\0xbb\0xbf" : "";
+
         // streams CSV output
         header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="query_export.csv"');
 
         // UTF-8 BOM for Excel
-        echo "\xEF\xBB\xBF";
+        echo $bom;
         // output buffering
         ob_start();
         $output = fopen('php://output', 'w');
@@ -109,7 +112,7 @@ class SqlForm extends BaseAction {
 
         exit;
     }
-    
+
     protected function getHtmlResponse(array $data) {
         if ($this->hasInput('preview')) {
             $data['rows'] = $this->module->dbSelect($data['query']);
