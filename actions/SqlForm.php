@@ -51,6 +51,14 @@ class SqlForm extends BaseAction {
         ];
         $this->getInputs($data, array_keys($data));
 
+        if ($this->hasInput('query')) {
+            $query = @base64_decode($data['query']);
+
+            if ($query !== false) {
+                $data['query'] = urldecode($query);
+            }
+        }
+
         $this->setResponse(
             $this->getAction() === 'sqlexplorer.csv'
                 ? $this->getCsvResponse($data)
@@ -59,14 +67,16 @@ class SqlForm extends BaseAction {
     }
 
     protected function getCsvResponse(array $data) {
-        $cursor = DBselect($data['query']);
-        if ($cursor === false) {
+        $error = null;
+        $rows = $this->module->dbSelect($data['query'], $error);
+
+        if ($error !== null) {
             $response = new CControllerResponseRedirect(
                 (new CUrl('zabbix.php'))
                     ->setArgument('action', 'sqlexplorer.form')
                     ->getUrl()
             );
-            $response->setFormData($this->getInputAll());
+            $response->setFormData($data);
 
             if (version_compare(ZABBIX_VERSION, '6.0', '<')) {
                 [$message] = clear_messages();
@@ -78,8 +88,6 @@ class SqlForm extends BaseAction {
 
             return $response;
         }
-
-        $rows = DBfetchArray($cursor);
 
         if ($rows && $data['add_column_names']) {
             array_unshift($rows, array_keys($rows[0]));
@@ -106,12 +114,18 @@ class SqlForm extends BaseAction {
 
     protected function getHtmlResponse(array $data) {
         if ($this->hasInput('preview')) {
-            $data['rows'] = $this->module->dbSelect($data['query']);
-            $data['rows_limit'] = $this->getGuiSearchLimit();
-            $data['rows_count'] = count($data['rows']);
+            $error = null;
+            $rows = $this->module->dbSelect($data['query'], $error);
 
-            if ($data['rows_count'] > $data['rows_limit']) {
-                $data['rows'] = array_slice($data['rows'], 0, $data['rows_limit']);
+            if ($error === null) {
+                $data['rows_limit'] = $this->getGuiSearchLimit();
+                $data['rows_count'] = count($rows);
+
+                if ($data['rows_count'] > $data['rows_limit']) {
+                    $data['rows'] = array_slice($rows, 0, $data['rows_limit']);
+                }
+
+                $data['rows'] = $rows;
             }
 
             if (version_compare(ZABBIX_VERSION, '6.0', '<')) {
