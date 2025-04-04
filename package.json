@@ -18,6 +18,7 @@
         "@codemirror/basic-setup": "^0.17.1",
         "@codemirror/highlight": "^0.17.2",
         "@codemirror/lang-sql": "^0.17.1",
-        "@codemirror/view": "^0.17.7"
+        "@codemirror/view": "^0.17.7",
+        "@codemirror/theme-one-dark": "^0.17.1"
     }
 }
