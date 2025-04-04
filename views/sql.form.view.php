@@ -140,7 +140,7 @@ $widget
 CSS
     ))
     ->addItem(new JsonDataTag('page-json', [
-        'dark_theme' => in_array(getUserTheme(CWebUser::$data), ['dark-theme']),
+        'dark_theme' => in_array(getUserTheme(CWebUser::$data), ['dark-theme', 'hc-dark']),
         'queries' => $data['queries'],
         'db_schema' => $data['db_schema'],
         'token' => [
