@@ -36,6 +36,14 @@ $form_list = (new CFormList())
         (new CCheckBox('add_column_names', 1))->setChecked((bool) $data['add_column_names'])
     )
     ->addRow(
+        new CLabel(_('Add UTF-8 BOM to CSV export file')),
+        (new CCheckBox('add_bom_csv', 1))->setChecked((bool) $data['add_bom_csv'])
+    )
+    ->addRow(
+        new CLabel(_('Force single line column values in CSV export file')),
+        (new CCheckBox('force_single_line_csv', 1))->setChecked((bool) $data['force_single_line_csv'])
+    )
+    ->addRow(
         new CLabel(_('Stop words list'), 'stopwords'),
         (new CTextBox('stopwords', $data['stopwords']))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
     );

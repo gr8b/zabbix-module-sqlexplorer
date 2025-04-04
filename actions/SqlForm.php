@@ -45,6 +45,8 @@ class SqlForm extends BaseAction {
             'name' => '',
             'query'	 => "\n\n\n",
             'add_column_names' => Profile::getPersonal(Profile::KEY_SHOW_HEADER, 0),
+            'add_bom_csv' => Profile::getPersonal(Profile::KEY_BOM_CSV, 0),
+            'force_single_line_csv' => Profile::getPersonal(Profile::KEY_SINGLE_LINE_CSV, 0),
             'stopwords' => Profile::getPersonal(Profile::KEY_STOP_WORDS, Profile::DEFAULT_STOP_WORDS)
         ];
         $this->getInputs($data, array_keys($data));
@@ -58,7 +60,6 @@ class SqlForm extends BaseAction {
 
     protected function getCsvResponse(array $data) {
         $cursor = DBselect($data['query']);
-
         if ($cursor === false) {
             $response = new CControllerResponseRedirect(
                 (new CUrl('zabbix.php'))
@@ -84,8 +85,18 @@ class SqlForm extends BaseAction {
             array_unshift($rows, array_keys($rows[0]));
         }
 
+        if ($data['force_single_line_csv']) {
+            foreach ($rows as &$row) {
+                foreach ($row as &$col) {
+                    $col = str_replace(["\r", "\n"], ['', ' '], $col);
+                }
+                unset($col);
+            }
+            unset($row);
+        }
+
         $data = [
-            'main_block' => zbx_toCSV($rows)
+            'main_block' => ($data['add_bom_csv'] ? "\xef\xbb\xbf" : '').zbx_toCSV($rows)
         ];
         $response = new CControllerResponseData($data);
         $response->setFileName('query_export.csv');

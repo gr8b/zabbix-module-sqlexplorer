@@ -9,6 +9,11 @@ use Modules\SqlExplorer\Helpers\Html\ScriptTag;
 $url = (new Curl())
     ->setArgument('action', 'sqlexplorer.form')
     ->getUrl();
+
+if (version_compare(ZABBIX_VERSION, '7.2.0', '>')) { 
+    define('ZBX_DB_ORACLE', 3);  // Sets dummy value since Oracle DB support was dropped on 7.2. Makes it compatible with 7.2+ onwards
+} 
+
 $db_label = [
     ZBX_DB_MYSQL => _('MySQL'),
     ZBX_DB_POSTGRESQL => _('Postgre'),
